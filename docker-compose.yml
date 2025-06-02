@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  # ───────────────────────────────────────────────────────────────
+  # 1) PostgreSQL database
+  # ───────────────────────────────────────────────────────────────
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      # These should match what your Spring Boot expects
+      POSTGRES_DB: crm
+      POSTGRES_USER: crm_user
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # ───────────────────────────────────────────────────────────────
+  # 2) Backend: Spring Boot application
+  # ───────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: crm-backend
+    restart: on-failure
+    environment:
+      # Tell Spring Boot how to connect to Postgres in Docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/crm
+      SPRING_DATASOURCE_USERNAME: crm_user
+      SPRING_DATASOURCE_PASSWORD: secret
+
+      # Hibernate / JPA settings
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      # (Optional) If you have different profiles, you can activate one
+      SPRING_PROFILES_ACTIVE: docker
+
+      # JWT secret (set securely in production via env/secrets)
+      JWT_SECRET: VerySecretKeyForJwtSigning1234567890
+      JWT_EXPIRATION_MS: 86400000
+
+      # (Optional) override default Spring Boot server port if needed
+      # SPRING_SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    # Wait-for-it script or healthcheck can be added here if needed,
+    # to ensure the DB is up and running before Spring Boot starts.
+
+  # ───────────────────────────────────────────────────────────────
+  # 3) Frontend: Next.js application
+  # ───────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: crm-frontend
+    restart: on-failure
+    environment:
+      # Point Next.js at the backend’s API (inside Docker network "backend:8080")
+      NEXT_PUBLIC_API_BASE_URL: http://backend:8080/api
+      NEXT_PUBLIC_JWT_COOKIE_NAME: crm_jwt
+    ports:
+      # Map host port 3000 → container port 3000 (Next.js default)
+      - "3000:3000"
+    depends_on:
+      - backend
+    # If you want to run Next.js in production mode, ensure your Dockerfile
+    # does "npm run build" then "npm start" (or "next start").
+
+volumes:
+  db-data:
