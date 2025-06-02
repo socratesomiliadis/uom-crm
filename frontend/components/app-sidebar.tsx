@@ -81,53 +81,61 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="border-b-[0px] overflow-hidden transition-all duration-300 ease-out p-4 mt-2 group-data-[collapsible=icon]:p-[calc(1rem-2.5px)] flex flex-row items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="size-11 rounded-2xl flex items-center justify-center font-black text-xl text-white dark:text-black bg-[linear-gradient(90deg,#f4d3ca,#d1f0ea,#bdbff8,#cec0f5)] outline-[2px] outline-offset-[-3px] outline-white dark:outline-black">
-            C
-          </div>
-          <div className="flex flex-col gap-0">
-            <h1 className="text-base tracking-tight leading-none">Acme Inc.</h1>
-            <span className="text-sm text-black/60 dark:text-white/60">
-              Enterprise
-            </span>
-          </div>
-        </div>
-        <div className="size-8 bg-gradient-to-r text-white dark:text-black from-[#67f9e1] via-[#f0dd71] to-[#cd40f0] rounded-full flex items-center justify-center">
-          <svg
-            width="50%"
-            viewBox="0 0 18 19"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M9 0C6.51472 0 4.5 2.01472 4.5 4.5C4.5 6.98528 6.51472 9 9 9C11.4853 9 13.5 6.98528 13.5 4.5C13.5 2.01472 11.4853 0 9 0Z"
-              fill="currentColor"
-            />
-            <path
-              d="M9.0015 10C5.16958 10 2.23686 12.2962 1.04605 15.516C0.70562 16.4365 0.93869 17.3438 1.47985 17.9887C2.00722 18.6172 2.82133 19 3.69832 19H14.3046C15.1816 19 15.9957 18.6172 16.5231 17.9887C17.0643 17.3438 17.2973 16.4365 16.9569 15.516C15.7661 12.2962 12.8334 10 9.0015 10Z"
-              fill="currentColor"
-            />
-          </svg>
-        </div>
+        <span className="flex flex-row items-end gap-3 text-black dark:text-white ">
+          <span className="block group-data-[collapsible=icon]:w-6 w-8 transition-all duration-300 ease-out">
+            <svg
+              width="100%"
+              viewBox="0 0 121 162"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M59.9656 0.669922L64.7336 15.3442H80.163L67.6804 24.4134L72.4483 39.0877L59.9656 30.0185L47.483 39.0877L52.2509 24.4134L39.7682 15.3442H55.1977L59.9656 0.669922Z"
+                fill="currentColor"
+              />
+              <path
+                d="M46.1157 40.8352V130.399C46.1157 141.479 59.9658 153.483 59.9658 153.483C59.9658 153.483 74.2776 141.941 74.2776 130.399V40.8352L120.445 74.0754C120.445 74.0754 120.444 111.471 120.445 130.399C120.445 149.328 98.6948 161.331 83.0493 161.331C67.4038 161.331 59.9658 153.483 59.9658 153.483C59.9658 153.483 50.7836 161.331 36.8823 161.331C22.981 161.331 1.33398 151.174 0.410457 130.399C-0.513071 109.624 0.410457 74.0754 0.410457 74.0754L46.1157 40.8352Z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+          <span className="block w-24 mb-1">
+            <svg
+              width="100%"
+              viewBox="0 0 351 77"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M36.5682 0.644391C52.843 0.644391 66.0663 10.4093 67.8972 26.7858H52.4361C51.3172 19.6656 44.5021 14.0711 36.5682 14.0711C23.5483 14.0711 16.8349 24.3446 16.8349 38.9919C16.8349 52.6221 23.2432 63.3025 36.5682 63.3025C45.7228 63.3025 51.7241 57.4028 53.0464 47.0276H68.5075C66.88 65.3368 54.3688 76.7292 36.5682 76.7292C14.3937 76.7292 0.865271 60.2509 0.865271 38.9919C0.865271 17.5295 14.0886 0.644391 36.5682 0.644391ZM72.8011 22.412H87.245V52.2152C87.245 60.2509 89.3811 65.0317 96.5013 65.0317C104.435 65.0317 107.69 60.4544 107.69 50.0792V22.412H122.134V75H108.402V67.6763H108.097C104.435 73.576 98.3322 76.424 91.924 76.424C78.1921 76.424 72.8011 69.5072 72.8011 55.0633V22.412ZM158.729 20.9879C160.154 20.9879 161.171 21.2931 161.883 21.4965V34.9232C160.459 34.6181 158.729 34.4147 156.695 34.4147C146.218 34.4147 142.455 41.6366 142.455 51.2998V75H128.011V22.412H141.743V32.1769H141.946C144.692 25.5652 151.508 20.9879 158.729 20.9879ZM184.982 20.9879C201.562 20.9879 210.615 34.0078 210.615 49.5706C210.615 50.3843 210.513 52.2152 210.513 52.2152H172.573C172.98 61.2681 177.15 65.5403 185.389 65.5403C190.882 65.5403 195.764 62.387 196.883 58.7252H209.598C205.733 70.6261 197.595 76.424 184.982 76.424C168.3 76.424 158.129 64.93 158.129 48.7568C158.129 32.8889 169.114 20.9879 184.982 20.9879ZM172.573 43.0607H196.069C194.645 35.1267 191.187 31.8717 184.474 31.8717C177.455 31.8717 173.183 36.1439 172.573 43.0607ZM244.306 20.9879C252.138 20.9879 257.224 24.2429 259.665 29.7356C263.53 24.1412 269.227 20.9879 275.635 20.9879C288.655 20.9879 294.758 28.1082 294.758 39.704V75H280.314V44.5864C280.314 37.6696 279.297 32.3803 271.464 32.3803C264.649 32.3803 261.801 37.161 261.801 45.6036V75H247.357V43.9761C247.357 37.161 246.34 32.3803 238.61 32.3803C235.253 32.3803 228.845 34.7198 228.845 44.383V75H214.401V22.412H228.031V29.5322H228.234C232.303 23.7343 237.796 20.9879 244.306 20.9879ZM325.299 20.9879C340.658 20.9879 348.287 26.1755 348.287 35.9404V63.8111C348.287 67.9815 348.795 72.8639 350.118 75H335.47C334.962 73.3725 334.555 71.6433 334.453 69.9141C330.384 74.1863 324.18 76.424 316.754 76.424C305.972 76.424 298.852 70.8296 298.852 60.6578C298.852 55.5719 300.479 52.0118 303.429 49.4689C306.786 46.6208 311.668 45.095 320.416 44.1795C329.774 43.1624 333.843 42.3486 333.843 37.6696C333.843 31.6683 329.469 30.6511 324.586 30.6511C318.585 30.6511 315.432 33.0923 314.923 38.5851H300.479C301.09 27.091 310.549 20.9879 325.299 20.9879ZM313.296 60.0475C313.296 64.2179 315.839 66.7609 322.145 66.7609C329.876 66.7609 333.843 62.5904 333.843 54.8599V49.2654C332.52 50.486 329.978 51.1981 325.095 51.8084C317.67 52.7238 313.296 54.3513 313.296 60.0475Z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+        </span>
       </SidebarHeader>
       <SidebarContent className="whitespace-nowrap">
         <SidebarGroup>
-          <SidebarMenuButton asChild className="">
-            <button>
-              <Search />
-              <span>Search</span>
+          <SidebarMenuButton
+            asChild
+            className="cursor-pointer bg-white dark:bg-black rounded-lg transition-all duration-300  ease-out group-data-[collapsible=icon]:[&>svg]:size-4 [&>svg]:size-5 px-3"
+          >
+            <div>
+              <Search className="text-black/60 dark:text-white/60" />
+              <input
+                type="text"
+                placeholder="Search"
+                className="bg-transparent outline-none w-[80%]"
+              />
               <span className="ml-auto dark:bg-white/15 bg-black/10 size-5 flex items-center justify-center rounded-md text-xs">
                 /
               </span>
-            </button>
+            </div>
           </SidebarMenuButton>
         </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Main</SidebarGroupLabel>
-          <SidebarMenuButton
-            asChild
-            className="text-base hover:bg-[#f3f3f3] dark:hover:bg-[#151515] transition-all duration-300 ease-out"
-          >
+          <SidebarMenuButton asChild className="text-base">
             <Link href="/dashboard">
               <svg
                 width="100%"
@@ -156,10 +164,7 @@ export function AppSidebar({
               <span>Dashboard</span>
             </Link>
           </SidebarMenuButton>
-          <SidebarMenuButton
-            asChild
-            className="text-base hover:bg-[#f3f3f3] dark:hover:bg-[#151515] transition-all duration-300 ease-out [&>svg]:size-4.5"
-          >
+          <SidebarMenuButton asChild className="text-base [&>svg]:w-5">
             <Link href="/dashboard/contacts">
               <svg
                 viewBox="0 0 22 18"
@@ -187,10 +192,7 @@ export function AppSidebar({
               <span>Contacts</span>
             </Link>
           </SidebarMenuButton>
-          <SidebarMenuButton
-            asChild
-            className="text-base hover:bg-[#f3f3f3] dark:hover:bg-[#151515] transition-all duration-300 ease-out [&>svg]:w-4.5"
-          >
+          <SidebarMenuButton asChild className="text-base [&>svg]:w-5">
             <Link href="/dashboard/companies">
               <svg
                 viewBox="0 0 22 17"
@@ -198,8 +200,8 @@ export function AppSidebar({
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M2 3C2 1.34315 3.34315 0 5 0H11C12.6569 0 14 1.34315 14 3V4V15H15V4H17C18.6569 4 20 5.34315 20 7V15H21C21.5523 15 22 15.4477 22 16C22 16.5523 21.5523 17 21 17H1C0.44772 17 0 16.5523 0 16C0 15.4477 0.44772 15 1 15H2V3ZM6 6C6 5.44772 6.44772 5 7 5H9C9.5523 5 10 5.44772 10 6C10 6.55228 9.5523 7 9 7H7C6.44772 7 6 6.55228 6 6ZM6 10C6 9.4477 6.44772 9 7 9H9C9.5523 9 10 9.4477 10 10C10 10.5523 9.5523 11 9 11H7C6.44772 11 6 10.5523 6 10Z"
                   fill="currentColor"
                 />
