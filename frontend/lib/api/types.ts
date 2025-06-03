@@ -53,3 +53,12 @@ export interface ActivityDto {
 export interface AuthResponse {
   token: string;
 }
+
+export interface ContactCreateDto {
+  companyId?: number | null;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string | null;
+  jobTitle?: string | null;
+}
