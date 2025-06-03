@@ -30,7 +30,7 @@ export async function fetchDirect<T>(
     let message = `Request failed: ${res.status} ${res.statusText}`;
     try {
       const err = await res.json();
-      if (err?.message) message = err.message;
+      if (err?.message) message = `${message} - ${err.message}`;
     } catch {}
     throw new Error(message);
   }

@@ -17,7 +17,7 @@ export async function getContacts() {
 
 export async function createContact(contact: ContactCreateDto) {
   try {
-    const contactReq = await fetchDirect("/contacts", {
+    await fetchDirect("/contacts", {
       method: "POST",
       body: JSON.stringify(contact),
     });
