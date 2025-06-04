@@ -29,55 +29,22 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { NavUser } from "./nav-user";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const data = {
-  navMain: [
-    {
-      title: "Trips",
-      url: "/dashboard/trips",
-      icon: TicketsPlane,
-      isActive: true,
-      items: [
-        {
-          title: "Upcoming Trips",
-          url: "/dashboard/trips",
-        },
-        {
-          title: "Past Trips",
-          url: "/dashboard/trips/past",
-        },
-      ],
-    },
-    {
-      title: "Passengers",
-      url: "#",
-      icon: Users,
-      isActive: true,
-      items: [
-        {
-          title: "Manage Passengers",
-          url: "/dashboard/passengers",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      isActive: true,
-      items: [
-        {
-          title: "General",
-          url: "/dashboard/settings/general",
-        },
-      ],
-    },
-  ],
+  user: {
+    name: "socrates",
+    email: "socrates@curema.com",
+    avatar: "/avatars/socrates.jpg",
+  },
 };
 
 export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar> & {}) {
+  const pathname = usePathname();
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="border-b-[0px] overflow-hidden transition-all duration-300 ease-out p-4 mt-2 group-data-[collapsible=icon]:p-[calc(1rem-2.5px)] flex flex-row items-center justify-between">
@@ -135,8 +102,14 @@ export function AppSidebar({
         </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Main</SidebarGroupLabel>
-          <SidebarMenuButton asChild className="text-base">
-            <Link href="/dashboard">
+          <SidebarMenuButton
+            asChild
+            className={cn(
+              "text-base",
+              pathname === "/dashboard" && "bg-[#fcfcfc] dark:bg-[#1c1c1c]"
+            )}
+          >
+            <Link prefetch={true} href="/dashboard">
               <svg
                 width="100%"
                 viewBox="0 0 18 18"
@@ -164,8 +137,15 @@ export function AppSidebar({
               <span>Dashboard</span>
             </Link>
           </SidebarMenuButton>
-          <SidebarMenuButton asChild className="text-base [&>svg]:w-5">
-            <Link href="/dashboard/contacts">
+          <SidebarMenuButton
+            asChild
+            className={cn(
+              "text-base [&>svg]:w-5",
+              pathname === "/dashboard/contacts" &&
+                "bg-[#fcfcfc] dark:bg-[#1c1c1c]"
+            )}
+          >
+            <Link prefetch={true} href="/dashboard/contacts">
               <svg
                 viewBox="0 0 22 18"
                 fill="none"
@@ -192,8 +172,15 @@ export function AppSidebar({
               <span>Contacts</span>
             </Link>
           </SidebarMenuButton>
-          <SidebarMenuButton asChild className="text-base [&>svg]:w-5">
-            <Link href="/dashboard/companies">
+          <SidebarMenuButton
+            asChild
+            className={cn(
+              "text-base [&>svg]:w-5",
+              pathname === "/dashboard/companies" &&
+                "bg-[#fcfcfc] dark:bg-[#1c1c1c]"
+            )}
+          >
+            <Link prefetch={true} href="/dashboard/companies">
               <svg
                 viewBox="0 0 22 17"
                 fill="none"
@@ -210,8 +197,15 @@ export function AppSidebar({
               <span>Companies</span>
             </Link>
           </SidebarMenuButton>
-          <SidebarMenuButton asChild className="text-base">
-            <Link href="/dashboard/opportunities">
+          <SidebarMenuButton
+            asChild
+            className={cn(
+              "text-base",
+              pathname === "/dashboard/opportunities" &&
+                "bg-[#fcfcfc] dark:bg-[#1c1c1c]"
+            )}
+          >
+            <Link prefetch={true} href="/dashboard/opportunities">
               <svg
                 width="100%"
                 viewBox="0 0 20 19"
@@ -230,8 +224,15 @@ export function AppSidebar({
               <span>Opportunities</span>
             </Link>
           </SidebarMenuButton>
-          <SidebarMenuButton asChild className="text-base [&>svg]:size-">
-            <Link href="/dashboard/activities">
+          <SidebarMenuButton
+            asChild
+            className={cn(
+              "text-base [&>svg]:size-5",
+              pathname === "/dashboard/activities" &&
+                "bg-[#fcfcfc] dark:bg-[#1c1c1c]"
+            )}
+          >
+            <Link prefetch={true} href="/dashboard/activities">
               <svg
                 width="100%"
                 viewBox="0 0 16 20"
@@ -251,7 +252,9 @@ export function AppSidebar({
           </SidebarMenuButton>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="pb-3.5">{/* <NavUser /> */}</SidebarFooter>
+      <SidebarFooter className="pb-4">
+        <NavUser user={data.user} />
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { createCompany, updateCompany } from "@/lib/api/company";
+import { Plus } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Company name is required"),
@@ -134,6 +135,7 @@ export default function AddOrEditCompanyForm({
       {!triggerButton && !externalIsOpen && !noTrigger && (
         <DialogTrigger asChild>
           <Button className="ml-auto cursor-pointer">
+            <Plus className="mr-2 h-4 w-4" />
             {triggerButtonText}
           </Button>
         </DialogTrigger>

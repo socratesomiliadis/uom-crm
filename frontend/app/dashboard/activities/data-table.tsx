@@ -35,15 +35,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ContactDto, OpportunityDto } from "@/lib/api/types";
+import { ContactDto, ActivityDto } from "@/lib/api/types";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { deleteOpportunity } from "@/lib/api/opportunity";
-import AddOrEditOpportunityForm, {
-  OpportunityData,
-} from "./add-edit-activity-form";
+import { deleteActivity } from "@/lib/api/activity";
+import AddOrEditActivityForm, { ActivityData } from "./add-edit-activity-form";
 
-export const columns: ColumnDef<OpportunityDto>[] = [
+export const columns: ColumnDef<ActivityDto>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -67,7 +65,7 @@ export const columns: ColumnDef<OpportunityDto>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "title",
+    accessorKey: "type",
     header: ({ column }) => {
       return (
         <Button
@@ -75,58 +73,27 @@ export const columns: ColumnDef<OpportunityDto>[] = [
           className="cursor-pointer"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Title
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("title")}</div>
-    ),
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="cursor-pointer"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Amount
+          Type
           <ArrowUpDown />
         </Button>
       );
     },
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-      return <div className="font-medium">{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "stage",
-    header: "Stage",
-    cell: ({ row }) => {
-      const stage = row.getValue("stage") as string;
-      const stageColors = {
-        NEW: "bg-blue-100 text-blue-800",
-        QUALIFIED: "bg-green-100 text-green-800",
-        PROPOSAL: "bg-yellow-100 text-yellow-800",
-        NEGOTIATION: "bg-orange-100 text-orange-800",
-        WON: "bg-emerald-100 text-emerald-800",
-        LOST: "bg-red-100 text-red-800",
+      const type = row.getValue("type") as string;
+      const typeColors = {
+        CALL: "bg-blue-100 text-blue-800",
+        EMAIL: "bg-green-100 text-green-800",
+        MEETING: "bg-purple-100 text-purple-800",
+        NOTE: "bg-yellow-100 text-yellow-800",
+        TASK: "bg-orange-100 text-orange-800",
       };
       return (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
-            stageColors[stage as keyof typeof stageColors]
+            typeColors[type as keyof typeof typeColors]
           }`}
         >
-          {stage}
+          {type}
         </span>
       );
     },
@@ -144,28 +111,115 @@ export const columns: ColumnDef<OpportunityDto>[] = [
     },
   },
   {
-    accessorKey: "closeDate",
-    header: "Close Date",
+    accessorKey: "subject",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="cursor-pointer"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Subject
+          <ArrowUpDown />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      const closeDate = row.getValue("closeDate") as string;
-      if (!closeDate) {
-        return <div className="text-muted-foreground">No date set</div>;
+      const subject = row.getValue("subject") as string;
+      return (
+        <div className="font-medium text-ellipsis overflow-hidden w-96">
+          {subject || (
+            <span className="text-muted-foreground italic">No subject</span>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => {
+      const description = row.getValue("description") as string;
+      return (
+        <div className="max-w-[200px] truncate">
+          {description || (
+            <span className="text-muted-foreground italic">No description</span>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "completed",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="cursor-pointer"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const completed = row.getValue("completed") as boolean;
+      return (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            completed
+              ? "bg-green-100 text-green-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+        >
+          {completed ? "Completed" : "Pending"}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "activityDate",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="cursor-pointer"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Activity Date
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const activityDate = row.getValue("activityDate") as string;
+      return <div>{new Date(activityDate).toLocaleDateString()}</div>;
+    },
+  },
+  {
+    accessorKey: "dueDate",
+    header: "Due Date",
+    cell: ({ row }) => {
+      const dueDate = row.getValue("dueDate") as string;
+      if (!dueDate) {
+        return <div className="text-muted-foreground">No due date</div>;
       }
-      return <div>{new Date(closeDate).toLocaleDateString()}</div>;
+      return <div>{new Date(dueDate).toLocaleDateString()}</div>;
     },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const opportunity = row.original;
+      const activity = row.original;
 
       return (
         <div className="flex items-center justify-end gap-2">
           <Button size="sm">View</Button>
 
-          <AddOrEditOpportunityForm
-            opportunityToEdit={opportunity as OpportunityData}
+          <AddOrEditActivityForm
+            activityToEdit={activity as ActivityData}
             triggerButton={
               <Button variant="outline" size="sm">
                 Edit
@@ -183,27 +237,27 @@ export const columns: ColumnDef<OpportunityDto>[] = [
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() =>
-                  navigator.clipboard.writeText(opportunity.id.toString())
+                  navigator.clipboard.writeText(activity.id.toString())
                 }
               >
-                Copy Opportunity ID
+                Copy Activity ID
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  navigator.clipboard.writeText(opportunity.title);
+                  navigator.clipboard.writeText(activity.subject || "");
                 }}
               >
-                Copy Opportunity Title
+                Copy Activity Subject
               </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
                 className="text-red-500"
                 onClick={() => {
-                  deleteOpportunity(opportunity.id);
+                  deleteActivity(activity.id);
                 }}
               >
-                Delete Opportunity
+                Delete Activity
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -213,7 +267,7 @@ export const columns: ColumnDef<OpportunityDto>[] = [
   },
 ];
 
-export default function DataTableDemo({ data }: { data: OpportunityDto[] }) {
+export default function DataTableDemo({ data }: { data: ActivityDto[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -246,10 +300,10 @@ export default function DataTableDemo({ data }: { data: OpportunityDto[] }) {
     <div className="w-full">
       <div className="flex items-center gap-3 py-4">
         <Input
-          placeholder="Filter by title..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter by subject..."
+          value={(table.getColumn("subject")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn("subject")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -280,7 +334,7 @@ export default function DataTableDemo({ data }: { data: OpportunityDto[] }) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <AddOrEditOpportunityForm />
+        <AddOrEditActivityForm />
       </div>
       <div className="rounded-md border">
         <Table>

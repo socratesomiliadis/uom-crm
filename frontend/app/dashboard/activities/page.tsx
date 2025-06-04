@@ -1,16 +1,18 @@
-import { getOpportunities } from "@/lib/api/opportunity";
+import { getActivities } from "@/lib/api/activity";
 import { getContactById } from "@/lib/api/contact";
 import DataTableDemo from "./data-table";
 
-export default async function OpportunitiesPage() {
-  const opportunities = await getOpportunities();
+export default async function ActivitiesPage() {
+  const activities = await getActivities();
 
-  const opportunitiesWithContact = await Promise.all(
-    opportunities?.map(async (opportunity) => ({
-      ...opportunity,
-      contact: await getContactById(opportunity.contactId),
+  const activitiesWithContact = await Promise.all(
+    activities?.map(async (activity) => ({
+      ...activity,
+      contact: activity.contactId
+        ? await getContactById(activity.contactId)
+        : null,
     })) || []
   );
 
-  return <DataTableDemo data={opportunitiesWithContact || []} />;
+  return <DataTableDemo data={activitiesWithContact || []} />;
 }

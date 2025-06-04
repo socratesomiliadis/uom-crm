@@ -168,6 +168,7 @@ export default function AddOrEditOpportunityForm({
             triggerButton
           ) : (
             <Button className="ml-auto cursor-pointer">
+              <Plus className="mr-2 h-4 w-4" />
               {triggerButtonText}
             </Button>
           )}
@@ -183,43 +184,28 @@ export default function AddOrEditOpportunityForm({
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Opportunity Information</h3>
 
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter opportunity title"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <div className="flex gap-4">
                   <FormField
                     control={form.control}
-                    name="amount"
+                    name="title"
                     render={({ field }) => (
-                      <FormItem className="w-1/2">
-                        <FormLabel>Amount</FormLabel>
+                      <FormItem className="w-full">
+                        <FormLabel>Title</FormLabel>
                         <FormControl>
-                          <Input type="text" placeholder="0.00" {...field} />
+                          <Input
+                            placeholder="Enter opportunity title"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="stage"
                     render={({ field }) => (
-                      <FormItem className="w-1/2">
+                      <FormItem>
                         <FormLabel>Stage</FormLabel>
                         <Select
                           onValueChange={field.onChange}
@@ -247,32 +233,47 @@ export default function AddOrEditOpportunityForm({
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="contactId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Contact</FormLabel>
-                      <FormControl>
-                        <Combobox
-                          options={contactOptions}
-                          value={field.value?.toString() || ""}
-                          onValueChange={(value) => {
-                            if (value === "" || value === "null") {
-                              field.onChange(undefined);
-                            } else {
-                              field.onChange(parseInt(value));
-                            }
-                          }}
-                          placeholder="Select a contact"
-                          searchPlaceholder="Search contacts..."
-                          emptyText="No contacts found."
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem className="w-1/2">
+                        <FormLabel>Amount</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contactId"
+                    render={({ field }) => (
+                      <FormItem className="w-1/2">
+                        <FormLabel>Contact</FormLabel>
+                        <FormControl>
+                          <Combobox
+                            options={contactOptions}
+                            value={field.value?.toString() || ""}
+                            onValueChange={(value) => {
+                              if (value === "" || value === "null") {
+                                field.onChange(undefined);
+                              } else {
+                                field.onChange(parseInt(value));
+                              }
+                            }}
+                            placeholder="Select a contact"
+                            searchPlaceholder="Search contacts..."
+                            emptyText="No contacts found."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}

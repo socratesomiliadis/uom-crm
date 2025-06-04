@@ -12,7 +12,7 @@ export async function getActivities() {
       {
         method: "GET",
       },
-      TAGS.OPPORTUNITY
+      TAGS.ACTIVITY
     );
 
     return activities;

@@ -9,6 +9,7 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { Calendar } from "lucide-react";
 
 export default async function DashboardLayout({
   children,
@@ -31,7 +32,16 @@ export default async function DashboardLayout({
                 <SidebarTrigger className="-ml-1 cursor-pointer" />
                 <DynamicBreadcrumbs />
               </div>
-              <ThemeToggle className="" />
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                {new Date().toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+                <ThemeToggle className="ml-2" />
+              </div>
             </header>
             <div className="w-full h-full flex flex-1 flex-col gap-4 p-4 z-0 relative pt-20">
               {children}

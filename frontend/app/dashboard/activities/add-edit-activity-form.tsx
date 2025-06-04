@@ -30,65 +30,67 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createOpportunity, updateOpportunity } from "@/lib/api/opportunity";
+import { createActivity, updateActivity } from "@/lib/api/activity";
 import { getContacts } from "@/lib/api/contact";
 import { ContactDto } from "@/lib/api/types";
 import { Plus } from "lucide-react";
 import { DateTimePicker } from "@/components/datetime-picker";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   contactId: z.number().min(1, "Contact is required"),
-  title: z.string().min(1, "Title is required"),
-  amount: z
-    .string()
-    .min(1, "Amount is required")
-    .refine((val) => {
-      const num = parseFloat(val);
-      return !isNaN(num) && num >= 0;
-    }, "Amount must be a valid positive number"),
-  stage: z.enum(["NEW", "QUALIFIED", "PROPOSAL", "NEGOTIATION", "WON", "LOST"]),
-  closeDate: z.string().optional(),
+  type: z.enum(["CALL", "EMAIL", "MEETING", "NOTE", "TASK"]),
+  subject: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  activityDate: z.string().min(1, "Activity date is required"),
+  dueDate: z.string().optional().nullable(),
+  completed: z.boolean(),
 });
 
-type OpportunityDataFromSchema = z.infer<typeof formSchema>;
-export interface OpportunityData extends OpportunityDataFromSchema {
+type ActivityDataFromSchema = z.infer<typeof formSchema>;
+export interface ActivityData extends ActivityDataFromSchema {
   id: number;
 }
 
-interface AddOrEditOpportunityFormProps {
+interface AddOrEditActivityFormProps {
   triggerButton?: React.ReactNode;
-  opportunityToEdit?: OpportunityData;
+  activityToEdit?: ActivityData;
 }
 
-export default function AddOrEditOpportunityForm({
+export default function AddOrEditActivityForm({
   triggerButton,
-  opportunityToEdit,
-}: AddOrEditOpportunityFormProps) {
-  const isEditMode = !!opportunityToEdit;
+  activityToEdit,
+}: AddOrEditActivityFormProps) {
+  const isEditMode = !!activityToEdit;
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [contacts, setContacts] = useState<ContactDto[]>([]);
 
   const defaultFormValues = useMemo(() => {
-    if (isEditMode && opportunityToEdit) {
+    if (isEditMode && activityToEdit) {
       return {
-        contactId: opportunityToEdit.contactId,
-        title: opportunityToEdit.title,
-        amount: opportunityToEdit.amount.toString(),
-        stage: opportunityToEdit.stage,
-        closeDate: opportunityToEdit.closeDate || "",
+        contactId: activityToEdit.contactId,
+        type: activityToEdit.type,
+        subject: activityToEdit.subject || "",
+        description: activityToEdit.description || "",
+        activityDate: activityToEdit.activityDate,
+        dueDate: activityToEdit.dueDate || "",
+        completed: activityToEdit.completed,
       };
     }
     return {
       contactId: undefined,
-      title: "",
-      amount: "",
-      stage: "NEW" as const,
-      closeDate: "",
+      type: "CALL" as const,
+      subject: "",
+      description: "",
+      activityDate: new Date().toISOString(),
+      dueDate: "",
+      completed: false,
     };
-  }, [isEditMode, opportunityToEdit]);
+  }, [isEditMode, activityToEdit]);
 
-  const form = useForm<OpportunityDataFromSchema>({
+  const form = useForm<ActivityDataFromSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultFormValues,
   });
@@ -109,14 +111,13 @@ export default function AddOrEditOpportunityForm({
     return options;
   }, [contacts]);
 
-  // Stage options
-  const stageOptions = [
-    { value: "NEW", label: "New" },
-    { value: "QUALIFIED", label: "Qualified" },
-    { value: "PROPOSAL", label: "Proposal" },
-    { value: "NEGOTIATION", label: "Negotiation" },
-    { value: "WON", label: "Won" },
-    { value: "LOST", label: "Lost" },
+  // Activity type options
+  const typeOptions = [
+    { value: "CALL", label: "Call" },
+    { value: "EMAIL", label: "Email" },
+    { value: "MEETING", label: "Meeting" },
+    { value: "NOTE", label: "Note" },
+    { value: "TASK", label: "Task" },
   ];
 
   // Fetch contacts when the dialog opens
@@ -136,29 +137,32 @@ export default function AddOrEditOpportunityForm({
     }
   };
 
-  async function onSubmit(values: OpportunityDataFromSchema) {
+  async function onSubmit(values: ActivityDataFromSchema) {
     setError(null);
     try {
       const submitData = {
         ...values,
-        closeDate: values.closeDate || undefined,
+        contactId: values.contactId || null,
+        subject: values.subject || null,
+        description: values.description || null,
+        dueDate: values.dueDate || null,
       };
 
-      if (isEditMode && opportunityToEdit) {
-        await updateOpportunity(opportunityToEdit.id, submitData);
+      if (isEditMode && activityToEdit) {
+        await updateActivity(activityToEdit.id, submitData);
       } else {
-        await createOpportunity(submitData);
+        await createActivity(submitData);
       }
       setIsOpen(false);
     } catch (error) {
-      console.error("Failed to save opportunity:", error);
-      setError("Failed to save opportunity");
+      console.error("Failed to save activity:", error);
+      setError("Failed to save activity");
     }
   }
 
-  const dialogTitle = isEditMode ? "Edit Opportunity" : "Add New Opportunity";
-  const submitButtonText = isEditMode ? "Save Changes" : "Create Opportunity";
-  const triggerButtonText = isEditMode ? "Edit Opportunity" : "Add Opportunity";
+  const dialogTitle = isEditMode ? "Edit Activity" : "Add New Activity";
+  const submitButtonText = isEditMode ? "Save Changes" : "Create Activity";
+  const triggerButtonText = isEditMode ? "Edit Activity" : "Add Activity";
 
   return (
     <>
@@ -168,11 +172,12 @@ export default function AddOrEditOpportunityForm({
             triggerButton
           ) : (
             <Button className="ml-auto cursor-pointer">
+              <Plus className="mr-2 h-4 w-4" />
               {triggerButtonText}
             </Button>
           )}
         </DialogTrigger>
-        <DialogContent aria-describedby="opportunity-form">
+        <DialogContent aria-describedby="activity-form">
           <DialogHeader>
             <DialogTitle className="font-medium text-2xl tracking-tight">
               {dialogTitle}
@@ -181,57 +186,42 @@ export default function AddOrEditOpportunityForm({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Opportunity Information</h3>
-
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter opportunity title"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
+                <h3 className="text-lg font-medium">Activity Information</h3>
                 <div className="flex gap-4">
                   <FormField
                     control={form.control}
-                    name="amount"
+                    name="subject"
                     render={({ field }) => (
-                      <FormItem className="w-1/2">
-                        <FormLabel>Amount</FormLabel>
+                      <FormItem className="w-full">
+                        <FormLabel>Subject (Optional)</FormLabel>
                         <FormControl>
-                          <Input type="text" placeholder="0.00" {...field} />
+                          <Input
+                            placeholder="Enter activity subject"
+                            {...field}
+                            value={field.value || ""}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
-                    name="stage"
+                    name="type"
                     render={({ field }) => (
-                      <FormItem className="w-1/2">
-                        <FormLabel>Stage</FormLabel>
+                      <FormItem className="">
+                        <FormLabel>Type</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select stage" />
+                              <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {stageOptions.map((option) => (
+                            {typeOptions.map((option) => (
                               <SelectItem
                                 key={option.value}
                                 value={option.value}
@@ -246,6 +236,25 @@ export default function AddOrEditOpportunityForm({
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter activity description"
+                          rows={3}
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
@@ -274,27 +283,67 @@ export default function AddOrEditOpportunityForm({
                   )}
                 />
 
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name="activityDate"
+                    render={({ field }) => (
+                      <FormItem className="w-1/2">
+                        <FormLabel>Activity Date</FormLabel>
+                        <FormControl>
+                          <DateTimePicker
+                            value={
+                              field.value ? new Date(field.value) : undefined
+                            }
+                            onChange={(date) =>
+                              field.onChange(date ? date.toISOString() : "")
+                            }
+                            // hideTime={true}
+                            clearable={false}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem className="w-1/2">
+                        <FormLabel>Due Date (Optional)</FormLabel>
+                        <FormControl>
+                          <DateTimePicker
+                            value={
+                              field.value ? new Date(field.value) : undefined
+                            }
+                            onChange={(date) =>
+                              field.onChange(date ? date.toISOString() : "")
+                            }
+                            // hideTime={true}
+                            clearable={true}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
-                  name="closeDate"
+                  name="completed"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Close Date (Optional)</FormLabel>
+                    <FormItem className="w-full flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
                       <FormControl>
-                        <DateTimePicker
-                          value={
-                            field.value ? new Date(field.value) : undefined
-                          }
-                          onChange={(date) =>
-                            field.onChange(
-                              date ? date.toISOString().split("T")[0] : ""
-                            )
-                          }
-                          hideTime={true}
-                          clearable={true}
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Completed</FormLabel>
+                      </div>
                     </FormItem>
                   )}
                 />
