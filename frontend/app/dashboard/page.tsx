@@ -259,7 +259,7 @@ async function CompaniesTable() {
         <CardDescription>All registered companies in your CRM</CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-32 px-6 overflow-x-auto" type="always">
+        <ScrollArea className="h-40 px-6 overflow-x-auto" type="always">
           <table className="w-full">
             <thead>
               <tr className="border-b">
@@ -352,7 +352,7 @@ function DashboardSkeleton() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Array.from({ length: 5 }).map((_, i) => (
+              {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex gap-3 p-3 border rounded-lg">
                   <Skeleton className="h-6 w-6 rounded" />
                   <div className="flex-1">
@@ -393,7 +393,7 @@ function DashboardSkeleton() {
 // Main Dashboard Page
 export default function DashboardPage() {
   return (
-    <div className="flex-1 space-y-6 p-6">
+    <div className="flex-1 space-y-6 p-0">
       <Suspense fallback={<DashboardSkeleton />}>
         <div className="space-y-6">
           <StatsCards />

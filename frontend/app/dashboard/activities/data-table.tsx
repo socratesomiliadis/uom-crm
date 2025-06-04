@@ -127,7 +127,7 @@ export const columns: ColumnDef<ActivityDto>[] = [
     cell: ({ row }) => {
       const subject = row.getValue("subject") as string;
       return (
-        <div className="font-medium text-ellipsis overflow-hidden w-96">
+        <div className="font-medium text-ellipsis overflow-hidden max-w-72">
           {subject || (
             <span className="text-muted-foreground italic">No subject</span>
           )}
