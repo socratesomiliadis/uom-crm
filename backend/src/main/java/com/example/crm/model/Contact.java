@@ -14,8 +14,16 @@ public class Contact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "company_id")
+    @ManyToOne(optional = true)
+    @JoinColumn(
+            name = "company_id",
+            nullable = true,
+            foreignKey = @ForeignKey(
+                    name = "fk_contact_company",
+                    foreignKeyDefinition =
+                            "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL"
+            )
+    )
     private Company company;
 
     @Column(nullable = false, length = 100)

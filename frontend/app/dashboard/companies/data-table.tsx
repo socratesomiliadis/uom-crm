@@ -35,13 +35,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CompanyDto, ContactDto } from "@/lib/api/types";
+import { createCompany, deleteCompany } from "@/lib/api/company";
+import { CompanyDto } from "@/lib/api/types";
 import { useRouter } from "next/navigation";
-import AddOrEditContactForm, { ContactData } from "./add-edit-contact-form";
+import AddOrEditCompanyForm, { CompanyData } from "./add-edit-company-form";
 import Link from "next/link";
-import { deleteContact } from "@/lib/api/contact";
-
-export const columns: ColumnDef<ContactDto>[] = [
+export const columns: ColumnDef<CompanyDto>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -65,14 +64,7 @@ export const columns: ColumnDef<ContactDto>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "firstName",
-    header: "First Name",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("firstName")}</div>
-    ),
-  },
-  {
-    accessorKey: "lastName",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -80,69 +72,54 @@ export const columns: ColumnDef<ContactDto>[] = [
           className="cursor-pointer"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Last Name
+          Name
           <ArrowUpDown />
         </Button>
       );
     },
+    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+  },
+  {
+    accessorKey: "industry",
+    header: "Industry",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("lastName")}</div>
+      <div className="capitalize">{row.getValue("industry")}</div>
     ),
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "website",
+    header: "Website",
     cell: ({ row }) => (
       <Link
-        href={`mailto:${row.getValue("email")}`}
+        href={row.getValue("website")}
         className="lowercase"
         target="_blank"
       >
-        {row.getValue("email")}
+        {row.getValue("website")}
       </Link>
     ),
   },
   {
-    accessorKey: "company",
-    header: "Company",
+    accessorKey: "location",
+    header: "Location",
     cell: ({ row }) => {
-      const company = row.getValue("company") as CompanyDto | null;
-      if (!company) {
-        return <div>No Company</div>;
-      }
-      return (
-        <Link href={`/dashboard/companies/${company.id}`}>{company.name}</Link>
-      );
-    },
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-    cell: ({ row }) => {
-      const phone = row.getValue("phone") as string;
+      const location = row.getValue("location") as string;
 
-      return <div className="">{phone}</div>;
+      return <div className="">{location}</div>;
     },
   },
-  {
-    accessorKey: "jobTitle",
-    header: "Job Title",
-    cell: ({ row }) => {
-      const jobTitle = row.getValue("jobTitle") as string;
-      return <div className="">{jobTitle}</div>;
-    },
-  },
+
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const contact = row.original;
+      const company = row.original;
 
       return (
         <div className="flex items-center justify-end gap-2">
           <Button size="sm">View</Button>
-          <AddOrEditContactForm
-            contactToEdit={contact as ContactData}
+          <AddOrEditCompanyForm
+            companyToEdit={company as CompanyData}
             triggerButton={
               <Button variant="outline" size="sm">
                 Edit
@@ -160,28 +137,25 @@ export const columns: ColumnDef<ContactDto>[] = [
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() =>
-                  navigator.clipboard.writeText(contact.id.toString())
+                  navigator.clipboard.writeText(company.id.toString())
                 }
               >
-                Copy Contact ID
+                Copy Company ID
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
-                  const name = `${contact.firstName} ${contact.lastName}`;
-                  navigator.clipboard.writeText(name);
-                }}
+                onClick={() => navigator.clipboard.writeText(company.name)}
               >
-                Copy Contact Name
+                Copy Company Name
               </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
                 className="text-red-500"
                 onClick={() => {
-                  deleteContact(contact.id);
+                  deleteCompany(company.id);
                 }}
               >
-                Delete Contact
+                Delete Company
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -191,7 +165,7 @@ export const columns: ColumnDef<ContactDto>[] = [
   },
 ];
 
-export default function DataTableDemo({ data }: { data: ContactDto[] }) {
+export default function DataTableDemo({ data }: { data: CompanyDto[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -224,10 +198,10 @@ export default function DataTableDemo({ data }: { data: ContactDto[] }) {
     <div className="w-full">
       <div className="flex items-center gap-3 py-4">
         <Input
-          placeholder="Filter email..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter companies..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -257,7 +231,7 @@ export default function DataTableDemo({ data }: { data: ContactDto[] }) {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <AddOrEditContactForm />
+        <AddOrEditCompanyForm />
       </div>
       <div className="rounded-md border">
         <Table>

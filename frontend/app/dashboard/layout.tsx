@@ -24,8 +24,8 @@ export default async function DashboardLayout({
     <div data-no-lenis>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="relative h-svh pr-3 py-3 bg-[#f2f2f2] dark:bg-[#101010]">
-          <div className="relative h-full w-full rounded-2xl bg-white dark:bg-black">
+        <SidebarInset className="relative h-svh pr-4 py-4 bg-[#f2f2f2] dark:bg-[#101010]">
+          <div className="relative h-full w-full rounded-2xl bg-white dark:bg-black shadow-md dark:shadow-none z-10">
             <header className="absolute w-full z-[45] flex h-16 shrink-0 border-b-[1px] border-black/[0.1] dark:border-white/[0.1] items-center justify-between pr-4 gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-14">
               <div className="flex items-center gap-2 px-4">
                 <SidebarTrigger className="-ml-1 cursor-pointer" />

@@ -35,13 +35,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CompanyDto, ContactDto } from "@/lib/api/types";
+import { ContactDto, OpportunityDto } from "@/lib/api/types";
 import { useRouter } from "next/navigation";
-import AddOrEditContactForm, { ContactData } from "./add-edit-contact-form";
 import Link from "next/link";
-import { deleteContact } from "@/lib/api/contact";
+import { deleteOpportunity } from "@/lib/api/opportunity";
+import AddOrEditOpportunityForm, {
+  OpportunityData,
+} from "./add-edit-opportunity-form";
 
-export const columns: ColumnDef<ContactDto>[] = [
+export const columns: ColumnDef<OpportunityDto>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -65,14 +67,7 @@ export const columns: ColumnDef<ContactDto>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "firstName",
-    header: "First Name",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("firstName")}</div>
-    ),
-  },
-  {
-    accessorKey: "lastName",
+    accessorKey: "title",
     header: ({ column }) => {
       return (
         <Button
@@ -80,69 +75,97 @@ export const columns: ColumnDef<ContactDto>[] = [
           className="cursor-pointer"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Last Name
+          Title
           <ArrowUpDown />
         </Button>
       );
     },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("lastName")}</div>
+      <div className="font-medium">{row.getValue("title")}</div>
     ),
   },
   {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => (
-      <Link
-        href={`mailto:${row.getValue("email")}`}
-        className="lowercase"
-        target="_blank"
-      >
-        {row.getValue("email")}
-      </Link>
-    ),
-  },
-  {
-    accessorKey: "company",
-    header: "Company",
-    cell: ({ row }) => {
-      const company = row.getValue("company") as CompanyDto | null;
-      if (!company) {
-        return <div>No Company</div>;
-      }
+    accessorKey: "amount",
+    header: ({ column }) => {
       return (
-        <Link href={`/dashboard/companies/${company.id}`}>{company.name}</Link>
+        <Button
+          variant="ghost"
+          className="cursor-pointer"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("amount"));
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(amount);
+      return <div className="font-medium">{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: "stage",
+    header: "Stage",
+    cell: ({ row }) => {
+      const stage = row.getValue("stage") as string;
+      const stageColors = {
+        NEW: "bg-blue-100 text-blue-800",
+        QUALIFIED: "bg-green-100 text-green-800",
+        PROPOSAL: "bg-yellow-100 text-yellow-800",
+        NEGOTIATION: "bg-orange-100 text-orange-800",
+        WON: "bg-emerald-100 text-emerald-800",
+        LOST: "bg-red-100 text-red-800",
+      };
+      return (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            stageColors[stage as keyof typeof stageColors]
+          }`}
+        >
+          {stage}
+        </span>
       );
     },
   },
   {
-    accessorKey: "phone",
-    header: "Phone",
+    accessorKey: "contact",
+    header: "Contact",
     cell: ({ row }) => {
-      const phone = row.getValue("phone") as string;
-
-      return <div className="">{phone}</div>;
+      const contact = row.getValue("contact") as ContactDto;
+      return (
+        <div>
+          {contact?.firstName} {contact?.lastName}
+        </div>
+      );
     },
   },
   {
-    accessorKey: "jobTitle",
-    header: "Job Title",
+    accessorKey: "closeDate",
+    header: "Close Date",
     cell: ({ row }) => {
-      const jobTitle = row.getValue("jobTitle") as string;
-      return <div className="">{jobTitle}</div>;
+      const closeDate = row.getValue("closeDate") as string;
+      if (!closeDate) {
+        return <div className="text-muted-foreground">No date set</div>;
+      }
+      return <div>{new Date(closeDate).toLocaleDateString()}</div>;
     },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const contact = row.original;
+      const opportunity = row.original;
 
       return (
         <div className="flex items-center justify-end gap-2">
           <Button size="sm">View</Button>
-          <AddOrEditContactForm
-            contactToEdit={contact as ContactData}
+
+          <AddOrEditOpportunityForm
+            opportunityToEdit={opportunity as OpportunityData}
             triggerButton={
               <Button variant="outline" size="sm">
                 Edit
@@ -160,28 +183,27 @@ export const columns: ColumnDef<ContactDto>[] = [
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() =>
-                  navigator.clipboard.writeText(contact.id.toString())
+                  navigator.clipboard.writeText(opportunity.id.toString())
                 }
               >
-                Copy Contact ID
+                Copy Opportunity ID
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  const name = `${contact.firstName} ${contact.lastName}`;
-                  navigator.clipboard.writeText(name);
+                  navigator.clipboard.writeText(opportunity.title);
                 }}
               >
-                Copy Contact Name
+                Copy Opportunity Title
               </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
                 className="text-red-500"
                 onClick={() => {
-                  deleteContact(contact.id);
+                  deleteOpportunity(opportunity.id);
                 }}
               >
-                Delete Contact
+                Delete Opportunity
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -191,7 +213,7 @@ export const columns: ColumnDef<ContactDto>[] = [
   },
 ];
 
-export default function DataTableDemo({ data }: { data: ContactDto[] }) {
+export default function DataTableDemo({ data }: { data: OpportunityDto[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -224,10 +246,10 @@ export default function DataTableDemo({ data }: { data: ContactDto[] }) {
     <div className="w-full">
       <div className="flex items-center gap-3 py-4">
         <Input
-          placeholder="Filter email..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter by title..."
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -257,7 +279,8 @@ export default function DataTableDemo({ data }: { data: ContactDto[] }) {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <AddOrEditContactForm />
+
+        <AddOrEditOpportunityForm />
       </div>
       <div className="rounded-md border">
         <Table>

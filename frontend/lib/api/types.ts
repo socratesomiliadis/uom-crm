@@ -13,6 +13,9 @@ export interface CompanyDto {
   updatedAt: string; // ISO timestamp string
 }
 
+export interface CompanyCreateDto
+  extends Omit<CompanyDto, "id" | "createdAt" | "updatedAt"> {}
+
 export interface ContactDto {
   id: number;
   companyId?: number | null;
@@ -25,6 +28,9 @@ export interface ContactDto {
   updatedAt: string;
 }
 
+export interface ContactCreateDto
+  extends Omit<ContactDto, "id" | "createdAt" | "updatedAt"> {}
+
 export interface OpportunityDto {
   id: number;
   contactId: number;
@@ -36,10 +42,12 @@ export interface OpportunityDto {
   updatedAt: string;
 }
 
+export interface OpportunityCreateDto
+  extends Omit<OpportunityDto, "id" | "createdAt" | "updatedAt"> {}
+
 export interface ActivityDto {
   id: number;
   contactId?: number | null;
-  userId?: number | null;
   type: "CALL" | "EMAIL" | "MEETING" | "NOTE" | "TASK";
   subject?: string | null;
   description?: string | null;
@@ -50,15 +58,9 @@ export interface ActivityDto {
   updatedAt: string;
 }
 
+export interface ActivityCreateDto
+  extends Omit<ActivityDto, "id" | "createdAt" | "updatedAt"> {}
+
 export interface AuthResponse {
   token: string;
-}
-
-export interface ContactCreateDto {
-  companyId?: number | null;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string | null;
-  jobTitle?: string | null;
 }

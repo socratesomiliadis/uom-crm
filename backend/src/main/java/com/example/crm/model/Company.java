@@ -47,6 +47,7 @@ public class Company {
     @Column(nullable = false)
     private OffsetDateTime updatedAt = OffsetDateTime.now();
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "company", cascade = { CascadeType.PERSIST, CascadeType.MERGE },
+            orphanRemoval = false)
     private List<Contact> contacts;
 }

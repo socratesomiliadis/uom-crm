@@ -10,7 +10,6 @@ import java.time.OffsetDateTime;
 public class ActivityDto {
     private Long id;
     private Long contactId;
-    private Long userId;
     private ActivityType type;
     private String subject;
     private String description;

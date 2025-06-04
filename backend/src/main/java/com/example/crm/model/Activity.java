@@ -18,10 +18,6 @@ public class Activity {
     @JoinColumn(name = "contact_id")
     private Contact contact;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ActivityType type = ActivityType.NOTE;

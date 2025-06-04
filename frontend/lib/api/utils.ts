@@ -8,7 +8,8 @@ export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
  */
 export async function fetchDirect<T>(
   path: string,
-  options: Omit<RequestInit, "headers"> & { headers?: HeadersInit } = {}
+  options: Omit<RequestInit, "headers"> & { headers?: HeadersInit } = {},
+  tag?: string
 ): Promise<T> {
   const url = `${API_BASE}${path}`;
   // Next.js Server Component helper to read cookies
@@ -25,14 +26,16 @@ export async function fetchDirect<T>(
     ...options,
     headers,
     credentials: "include", // allow cookies if backend sets some
+    ...(tag ? { next: { tags: [tag] } } : {}),
   });
   if (!res.ok) {
     let message = `Request failed: ${res.status} ${res.statusText}`;
     try {
-      const err = await res.json();
+      const err = await res?.json();
       if (err?.message) message = `${message} - ${err.message}`;
     } catch {}
     throw new Error(message);
   }
+
   return res.json() as Promise<T>;
 }

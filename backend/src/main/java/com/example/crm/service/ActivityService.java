@@ -19,14 +19,12 @@ import java.util.stream.Collectors;
 public class ActivityService {
     private final ActivityRepository activityRepo;
     private final ContactRepository contactRepo;
-    private final UserRepository userRepo;
 
     public ActivityService(ActivityRepository activityRepo,
                            ContactRepository contactRepo,
                            UserRepository userRepo) {
         this.activityRepo = activityRepo;
         this.contactRepo = contactRepo;
-        this.userRepo = userRepo;
     }
 
     public List<ActivityDto> getAll() {
@@ -85,7 +83,6 @@ public class ActivityService {
         ActivityDto dto = new ActivityDto();
         dto.setId(a.getId());
         dto.setContactId(a.getContact() != null ? a.getContact().getId() : null);
-        dto.setUserId(a.getUser() != null ? a.getUser().getId() : null);
         dto.setType(a.getType());
         dto.setSubject(a.getSubject());
         dto.setDescription(a.getDescription());
@@ -110,11 +107,7 @@ public class ActivityService {
                     .orElseThrow(() -> new RuntimeException("Contact not found"));
             a.setContact(c);
         }
-        if (dto.getUserId() != null) {
-            User u = userRepo.findById(dto.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-            a.setUser(u);
-        }
+
         return a;
     }
 }

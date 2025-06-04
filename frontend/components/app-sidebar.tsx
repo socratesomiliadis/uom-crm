@@ -210,6 +210,45 @@ export function AppSidebar({
               <span>Companies</span>
             </Link>
           </SidebarMenuButton>
+          <SidebarMenuButton asChild className="text-base">
+            <Link href="/dashboard/opportunities">
+              <svg
+                width="100%"
+                viewBox="0 0 20 19"
+                fill="none"
+                className="mb-0.5"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M8 2C7.44772 2 7 2.44772 7 3V4H13V3C13 2.44772 12.5523 2 12 2H8ZM15 4V3C15 1.34315 13.6569 0 12 0H8C6.34315 0 5 1.34315 5 3V4H3C1.34315 4 0 5.34315 0 7V16C0 17.6569 1.34315 19 3 19H17C18.6569 19 20 17.6569 20 16V7C20 5.34315 18.6569 4 17 4H15Z"
+                  fill="currentColor"
+                />
+              </svg>
+
+              <span>Opportunities</span>
+            </Link>
+          </SidebarMenuButton>
+          <SidebarMenuButton asChild className="text-base [&>svg]:size-">
+            <Link href="/dashboard/activities">
+              <svg
+                width="100%"
+                viewBox="0 0 16 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M4.17071 2C4.58254 0.83481 5.69378 0 7 0H9C10.3062 0 11.4175 0.83481 11.8293 2H13C14.6569 2 16 3.34315 16 5V17C16 18.6569 14.6569 20 13 20H3C1.34315 20 0 18.6569 0 17V5C0 3.34315 1.34315 2 3 2H4.17071ZM6 3V4H10V3C10 2.44772 9.5523 2 9 2H7C6.4477 2 6 2.44772 6 3Z"
+                  fill="currentColor"
+                />
+              </svg>
+
+              <span>Activities</span>
+            </Link>
+          </SidebarMenuButton>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="pb-3.5">{/* <NavUser /> */}</SidebarFooter>
