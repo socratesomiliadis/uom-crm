@@ -216,7 +216,9 @@ export const columns: ColumnDef<ActivityDto>[] = [
 
       return (
         <div className="flex items-center justify-end gap-2">
-          <Button size="sm">View</Button>
+          <Button size="sm" asChild>
+            <Link href={`/dashboard/activities/${activity.id}`}>View</Link>
+          </Button>
 
           <AddOrEditActivityForm
             activityToEdit={activity as ActivityData}

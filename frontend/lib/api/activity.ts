@@ -1,6 +1,6 @@
 "use server";
 
-import { ActivityCreateDto, ActivityDto } from "./types";
+import { ActivityCreateDto, ActivityDto, ContactDto } from "./types";
 import { fetchDirect } from "./utils";
 import { TAGS } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
@@ -16,6 +16,22 @@ export async function getActivities() {
     );
 
     return activities;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getActivityById(id: number) {
+  try {
+    const activity = await fetchDirect<ActivityDto>(
+      `/activities/${id}`,
+      {
+        method: "GET",
+      },
+      TAGS.ACTIVITY
+    );
+
+    return activity;
   } catch (error) {
     console.error(error);
   }

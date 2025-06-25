@@ -117,7 +117,9 @@ export const columns: ColumnDef<CompanyDto>[] = [
 
       return (
         <div className="flex items-center justify-end gap-2">
-          <Button size="sm">View</Button>
+          <Button size="sm" asChild>
+            <Link href={`/dashboard/companies/${company.id}`}>View</Link>
+          </Button>
           <AddOrEditCompanyForm
             companyToEdit={company as CompanyData}
             triggerButton={

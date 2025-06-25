@@ -100,9 +100,9 @@ export const columns: ColumnDef<OpportunityDto>[] = [
     },
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("de-DE", {
         style: "currency",
-        currency: "USD",
+        currency: "EUR",
       }).format(amount);
       return <div className="font-medium">{formatted}</div>;
     },

@@ -100,7 +100,7 @@ export function AppSidebar({
             </div>
           </SidebarMenuButton>
         </SidebarGroup>
-        <SidebarGroup>
+        <SidebarGroup className="gap-1">
           <SidebarGroupLabel>Main</SidebarGroupLabel>
           <SidebarMenuButton
             asChild
@@ -227,7 +227,7 @@ export function AppSidebar({
           <SidebarMenuButton
             asChild
             className={cn(
-              "text-base [&>svg]:size-5",
+              "text-base [&>svg]:size-4.5",
               pathname === "/dashboard/activities" &&
                 "bg-[#fcfcfc] dark:bg-[#1c1c1c]"
             )}
@@ -235,14 +235,17 @@ export function AppSidebar({
             <Link prefetch={true} href="/dashboard/activities">
               <svg
                 width="100%"
-                viewBox="0 0 16 20"
+                className="mb-0.5"
+                viewBox="0 0 18 19"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M4.17071 2C4.58254 0.83481 5.69378 0 7 0H9C10.3062 0 11.4175 0.83481 11.8293 2H13C14.6569 2 16 3.34315 16 5V17C16 18.6569 14.6569 20 13 20H3C1.34315 20 0 18.6569 0 17V5C0 3.34315 1.34315 2 3 2H4.17071ZM6 3V4H10V3C10 2.44772 9.5523 2 9 2H7C6.4477 2 6 2.44772 6 3Z"
+                  d="M5 0C5.55228 0 6 0.447715 6 1V2H12V1C12 0.447715 12.4477 0 13 0C13.5523 0 14 0.447715 14 1V2H16C17.1046 2 18 2.89543 18 4V7H0V4C0 2.89543 0.895431 2 2 2H4V1C4 0.447715 4.44772 0 5 0Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M0 17V9H18V17C18 18.1046 17.1046 19 16 19H2C0.89543 19 0 18.1046 0 17Z"
                   fill="currentColor"
                 />
               </svg>

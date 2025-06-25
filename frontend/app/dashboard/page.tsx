@@ -63,7 +63,7 @@ async function StatsCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${totalRevenue.toLocaleString()}
+            {totalRevenue.toLocaleString()} €
           </div>
           <p className="text-xs text-muted-foreground">
             From {opportunities?.filter((o) => o.stage === "WON").length || 0}{" "}
@@ -79,7 +79,7 @@ async function StatsCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${pipelineValue.toLocaleString()}
+            {pipelineValue.toLocaleString()} €
           </div>
           <p className="text-xs text-muted-foreground">
             From{" "}
@@ -171,7 +171,9 @@ async function OpportunitiesPipeline() {
                   <span className="font-medium">{stage}</span>
                   <Badge variant="secondary">{count}</Badge>
                 </div>
-                <span className="font-semibold">${value.toLocaleString()}</span>
+                <span className="font-semibold">
+                  {value.toLocaleString()} €
+                </span>
               </div>
             );
           })}
@@ -232,7 +234,7 @@ async function RecentActivities() {
                   {activity.subject || activity.description || "No description"}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {new Date(activity.activityDate).toLocaleDateString()}
+                  {new Date(activity.activityDate).toLocaleDateString("el-GR")}
                 </p>
               </div>
             </div>
@@ -297,7 +299,7 @@ async function CompaniesTable() {
                     )}
                   </td>
                   <td className="p-2 text-muted-foreground text-sm">
-                    {new Date(company.createdAt).toLocaleDateString()}
+                    {new Date(company.createdAt).toLocaleDateString("el-GR")}
                   </td>
                 </tr>
               ))}

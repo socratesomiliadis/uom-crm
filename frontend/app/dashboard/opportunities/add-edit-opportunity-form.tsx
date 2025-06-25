@@ -239,7 +239,7 @@ export default function AddOrEditOpportunityForm({
                     name="amount"
                     render={({ field }) => (
                       <FormItem className="w-1/2">
-                        <FormLabel>Amount</FormLabel>
+                        <FormLabel>Amount in EUR</FormLabel>
                         <FormControl>
                           <Input type="text" placeholder="0.00" {...field} />
                         </FormControl>
