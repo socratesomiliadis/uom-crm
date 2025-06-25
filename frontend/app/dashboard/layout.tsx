@@ -7,48 +7,44 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { Calendar } from "lucide-react";
+import { ProtectedRoute } from "@/components/protected-route";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const jwt = cookieStore.get(process.env.NEXT_PUBLIC_JWT_COOKIE_NAME!);
-  if (!jwt) {
-    redirect("/");
-  }
   return (
-    <div data-no-lenis>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset className="relative h-svh pr-4 py-4 bg-[#f2f2f2] dark:bg-[#101010]">
-          <div className="relative h-full w-full rounded-2xl bg-white dark:bg-black shadow-md dark:shadow-none z-10">
-            <header className="absolute w-full z-[45] flex h-16 shrink-0 border-b-[1px] border-black/[0.1] dark:border-white/[0.1] items-center justify-between pr-4 gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-14">
-              <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1 cursor-pointer" />
-                <DynamicBreadcrumbs />
+    <ProtectedRoute>
+      <div data-no-lenis>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset className="relative h-svh pr-4 py-4 bg-[#f2f2f2] dark:bg-[#101010]">
+            <div className="relative h-full w-full rounded-2xl bg-white dark:bg-black shadow-md dark:shadow-none z-10">
+              <header className="absolute w-full z-[45] flex h-16 shrink-0 border-b-[1px] border-black/[0.1] dark:border-white/[0.1] items-center justify-between pr-4 gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-14">
+                <div className="flex items-center gap-2 px-4">
+                  <SidebarTrigger className="-ml-1 cursor-pointer" />
+                  <DynamicBreadcrumbs />
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  {new Date().toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                  <ThemeToggle className="ml-2" />
+                </div>
+              </header>
+              <div className="w-full h-full flex flex-1 flex-col gap-4 p-4 z-0 relative pt-20">
+                {children}
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-                <ThemeToggle className="ml-2" />
-              </div>
-            </header>
-            <div className="w-full h-full flex flex-1 flex-col gap-4 p-4 z-0 relative pt-20">
-              {children}
             </div>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
+          </SidebarInset>
+        </SidebarProvider>
+      </div>
+    </ProtectedRoute>
   );
 }

@@ -2,30 +2,49 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { AuthResponse } from "@/lib/api/types";
 import Link from "next/link";
 
-export default function LoginForm() {
+export default function RegisterForm() {
   const router = useRouter();
-  const { login, isLoading: authLoading } = useAuth();
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [passwordHash, setPasswordHash] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsLoading(true);
+
+    const emailHost = email.split("@")[1];
+    // if (emailHost !== "curema.com") {
+    //   setError("You must use a curema.com email address");
+    //   return;
+    // }
 
     try {
-      await login(username, password);
-      router.push("/dashboard");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, email, passwordHash }),
+        }
+      );
+      if (!res.ok) {
+        const error = await res
+          .json()
+          .catch(() => ({ message: "Registration failed" }));
+        throw new Error(error.message || "Registration failed");
+      }
+
+      // Registration successful, redirect to login
+      router.push("/");
     } catch (err: any) {
       setError(err.message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -52,9 +71,9 @@ export default function LoginForm() {
           />
         </svg>
       </span>
-      <span className="uppercase tracking-tight mt-10">Welcome Back</span>
+      <span className="uppercase tracking-tight mt-10">Welcome</span>
       <span className="text-3xl text-black font-medium tracking-tight">
-        Login to your account
+        Register a new account
       </span>
       <form
         onSubmit={handleSubmit}
@@ -66,8 +85,22 @@ export default function LoginForm() {
           </label>
           <input
             type="text"
+            autoComplete="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            required
+            className="text-black border-[1px] border-black/60 rounded-xl px-4 py-4 text-lg focus:outline-none"
+          />
+        </div>
+        <div className="w-full flex flex-col gap-2 relative">
+          <label className="absolute text-base bg-white -top-2.5 px-3 left-3">
+            Email
+          </label>
+          <input
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             className="text-black border-[1px] border-black/60 rounded-xl px-4 py-4 text-lg focus:outline-none"
           />
@@ -78,8 +111,9 @@ export default function LoginForm() {
           </label>
           <input
             type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            value={passwordHash}
+            onChange={(e) => setPasswordHash(e.target.value)}
             required
             className="text-black border-[1px] border-black/60 rounded-xl px-4 py-4 text-lg focus:outline-none"
           />
@@ -125,17 +159,16 @@ export default function LoginForm() {
         </div>
         <button
           type="submit"
-          disabled={isLoading || authLoading}
-          className="w-full cursor-pointer py-4 text-white bg-[#131313] rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full cursor-pointer py-4 text-white bg-[#131313] rounded-xl"
         >
-          {isLoading || authLoading ? "Signing in..." : "Continue"}
+          Continue
         </button>
         {error && <p className="text-red-500 absolute -bottom-8">{error}</p>}
       </form>
       <p className="text-black tracking-tight mt-12 text-lg">
-        Don't have an account?{" "}
-        <Link href="/register" className="text-blue-500">
-          Register
+        Already have an account?{" "}
+        <Link href="/" className="text-blue-500">
+          Login
         </Link>
       </p>
     </div>
