@@ -10,6 +10,7 @@ import {
   Settings2,
   TicketsPlane,
   Users,
+  UserIcon,
 } from "lucide-react";
 
 // import { NavMain } from "@/components/nav-main";
@@ -256,7 +257,7 @@ export function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="pb-4">
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

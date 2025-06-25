@@ -61,6 +61,31 @@ export interface ActivityDto {
 export interface ActivityCreateDto
   extends Omit<ActivityDto, "id" | "createdAt" | "updatedAt"> {}
 
+export interface UserInfoDto {
+  id: number;
+  username: string;
+  email: string;
+  role: "ADMIN";
+  lastLoginAt?: string;
+  createdAt: string;
+}
+
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+  sessionId: string;
+  user: UserInfoDto;
+  issuedAt: string;
+  expiresAt: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface AuthRequest {
+  username: string;
+  password: string;
 }

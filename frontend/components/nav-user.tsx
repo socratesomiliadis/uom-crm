@@ -16,27 +16,48 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { logout } from "@/lib/api/user";
+import { useAuth } from "@/lib/auth-context";
 import {
   BellIcon,
   CreditCardIcon,
   EllipsisVerticalIcon,
   LogOutIcon,
   UserIcon,
+  SmartphoneIcon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Link from "next/link";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar();
-  const router = useRouter();
+  const { user, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  if (!user) {
+    return null;
+  }
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  const handleLogoutAll = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout(true);
+    } catch (error) {
+      console.error("Logout all failed:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -48,11 +69,12 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">SO</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user.username.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">{user.username}</span>
                 <span className="text-muted-foreground truncate text-xs">
                   {user.email}
                 </span>
@@ -69,11 +91,12 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.username.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate font-medium">{user.username}</span>
                   <span className="text-muted-foreground truncate text-xs">
                     {user.email}
                   </span>
@@ -82,9 +105,11 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserIcon />
-                Account
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/account">
+                  <UserIcon />
+                  Account
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCardIcon />
@@ -96,14 +121,13 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={async () => {
-                await logout();
-                router.push("/");
-              }}
-            >
+            <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>
               <LogOutIcon />
-              Log out
+              {isLoggingOut ? "Signing out..." : "Sign out"}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogoutAll} disabled={isLoggingOut}>
+              <SmartphoneIcon />
+              {isLoggingOut ? "Signing out..." : "Sign out all devices"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
