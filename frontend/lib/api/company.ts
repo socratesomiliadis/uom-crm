@@ -1,12 +1,13 @@
 "use server";
 
 import { CompanyCreateDto, CompanyDto } from "./types";
-import { fetchDirect } from "./utils";
+import { fetchServer } from "./utils";
 import { revalidateTag } from "next/cache";
 import { TAGS } from "@/lib/constants";
+
 export async function getCompanies() {
   try {
-    const companies = await fetchDirect<CompanyDto[]>("/companies", {
+    const companies = await fetchServer<CompanyDto[]>("/companies", {
       method: "GET",
     });
 
@@ -18,7 +19,7 @@ export async function getCompanies() {
 
 export async function getCompanyById(id: number) {
   try {
-    const company = await fetchDirect<CompanyDto>(
+    const company = await fetchServer<CompanyDto>(
       `/companies/${id}`,
       {
         method: "GET",
@@ -34,7 +35,7 @@ export async function getCompanyById(id: number) {
 
 export async function createCompany(company: CompanyCreateDto) {
   try {
-    await fetchDirect(
+    await fetchServer(
       "/companies",
       {
         method: "POST",
@@ -50,7 +51,7 @@ export async function createCompany(company: CompanyCreateDto) {
 
 export async function updateCompany(id: number, company: CompanyCreateDto) {
   try {
-    await fetchDirect(
+    await fetchServer(
       `/companies/${id}`,
       {
         method: "PUT",
@@ -66,7 +67,7 @@ export async function updateCompany(id: number, company: CompanyCreateDto) {
 
 export async function deleteCompany(id: number) {
   try {
-    await fetchDirect(
+    await fetchServer(
       `/companies/${id}`,
       {
         method: "DELETE",

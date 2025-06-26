@@ -1,65 +1,63 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Forward the login request to the backend
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
 
     if (!response.ok) {
-      const error = await response
-        .json()
-        .catch(() => ({ message: "Login failed" }));
-      return NextResponse.json(error, { status: response.status });
+      const errorData = await response.json().catch(() => ({}));
+      return NextResponse.json(
+        { message: errorData.message || "Login failed" },
+        { status: response.status }
+      );
     }
 
     const authData = await response.json();
 
-    // Create response with the auth data
-    const nextResponse = NextResponse.json(authData);
+    // Set HTTP-only cookies for server-side authentication
+    const cookieStore = await cookies();
 
-    // Set JWT tokens as httpOnly cookies
-    if (authData.accessToken) {
-      nextResponse.cookies.set("accessToken", authData.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 24 * 60 * 60, // 24 hours
-      });
-    }
+    cookieStore.set("access_token", authData.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: authData.expiresIn || 3600, // 1 hour default
+      path: "/",
+    });
 
-    if (authData.refreshToken) {
-      nextResponse.cookies.set("refreshToken", authData.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-      });
-    }
+    cookieStore.set("refresh_token", authData.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: "/",
+    });
 
-    if (authData.sessionId) {
-      nextResponse.cookies.set("sessionId", authData.sessionId, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-      });
-    }
+    cookieStore.set("session_id", authData.sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: "/",
+    });
 
-    return nextResponse;
+    // Return auth data (without sensitive tokens for client storage)
+    return NextResponse.json({
+      ...authData,
+      // Don't send actual tokens to client for security
+      refreshToken: "set-in-cookie",
+    });
   } catch (error) {
     console.error("Login API error:", error);
     return NextResponse.json(

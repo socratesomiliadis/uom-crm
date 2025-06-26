@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/lib/auth-context";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -10,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useAuth } from "@/lib/auth-context";
 
 interface LogoutButtonProps {
   children?: React.ReactNode;
@@ -34,7 +34,7 @@ export function LogoutButton({ children, className }: LogoutButtonProps) {
   const handleLogoutAll = async () => {
     setIsLoading(true);
     try {
-      await logout(true);
+      await logout();
     } catch (error) {
       console.error("Logout all failed:", error);
     } finally {

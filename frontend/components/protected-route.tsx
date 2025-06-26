@@ -1,132 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  redirectTo?: string;
-  fallback?: React.ReactNode;
+  requiredRole?: "ADMIN" | "USER";
 }
 
 export function ProtectedRoute({
   children,
-  redirectTo = "/",
-  fallback,
+  requiredRole,
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        setShouldRedirect(true);
-        const timer = setTimeout(() => {
-          router.push(redirectTo);
-        }, 100); // Small delay to prevent hydration issues
+        router.push("/");
+        return;
+      }
 
-        return () => clearTimeout(timer);
-      } else {
-        setShouldRedirect(false);
+      if (requiredRole && user?.role !== requiredRole) {
+        // Redirect to dashboard or show unauthorized message
+        router.push("/dashboard");
+        return;
       }
     }
-  }, [isAuthenticated, isLoading, router, redirectTo]);
+  }, [isAuthenticated, isLoading, user, requiredRole, router]);
 
-  // Show loading state while authentication is being checked
-  if (isLoading) {
-    return (
-      fallback || (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-            <p className="text-sm text-muted-foreground">
-              Checking authentication...
-            </p>
-          </div>
-        </div>
-      )
-    );
-  }
-
-  // Show loading state during redirect
-  if (shouldRedirect || !isAuthenticated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-          <p className="text-sm text-muted-foreground">
-            Redirecting to login...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Additional check for user data
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-          <p className="text-sm text-muted-foreground">Loading user data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-}
-
-export function PublicRoute({
-  children,
-  redirectTo = "/dashboard",
-}: {
-  children: React.ReactNode;
-  redirectTo?: string;
-}) {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-  const [shouldRedirect, setShouldRedirect] = useState(false);
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        setShouldRedirect(true);
-        const timer = setTimeout(() => {
-          router.push(redirectTo);
-        }, 100); // Small delay to prevent hydration issues
-
-        return () => clearTimeout(timer);
-      } else {
-        setShouldRedirect(false);
-      }
-    }
-  }, [isAuthenticated, isLoading, router, redirectTo]);
-
-  // Show loading state while authentication is being checked
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-          <p className="text-sm text-muted-foreground">
-            Checking authentication...
-          </p>
-        </div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  // Show loading state during redirect
-  if (shouldRedirect || isAuthenticated) {
+  if (!isAuthenticated) {
+    return null; // Will redirect in useEffect
+  }
+
+  if (requiredRole && user?.role !== requiredRole) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-          <p className="text-sm text-muted-foreground">
-            Redirecting to dashboard...
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Unauthorized</h1>
+          <p className="text-gray-600">
+            You don't have permission to access this page.
           </p>
         </div>
       </div>

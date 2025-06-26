@@ -1,84 +1,76 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 export async function POST(request: NextRequest) {
   try {
-    // Get refresh token from cookie
-    const refreshToken = request.cookies.get("refreshToken")?.value;
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore.get("refresh_token")?.value;
 
     if (!refreshToken) {
       return NextResponse.json(
-        { message: "No refresh token found" },
+        { message: "No refresh token available" },
         { status: 401 }
       );
     }
 
-    // Forward the refresh request to the backend
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken }),
-      }
-    );
+    const response = await fetch(`${API_BASE}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
 
     if (!response.ok) {
-      const error = await response
-        .json()
-        .catch(() => ({ message: "Token refresh failed" }));
+      // Clear cookies if refresh failed
+      cookieStore.delete("access_token");
+      cookieStore.delete("refresh_token");
+      cookieStore.delete("session_id");
 
-      // If refresh failed, clear cookies
-      const nextResponse = NextResponse.json(error, {
-        status: response.status,
-      });
-      nextResponse.cookies.set("accessToken", "", { maxAge: 0, path: "/" });
-      nextResponse.cookies.set("refreshToken", "", { maxAge: 0, path: "/" });
-      nextResponse.cookies.set("sessionId", "", { maxAge: 0, path: "/" });
-
-      return nextResponse;
+      const errorData = await response.json().catch(() => ({}));
+      return NextResponse.json(
+        { message: errorData.message || "Token refresh failed" },
+        { status: response.status }
+      );
     }
 
     const authData = await response.json();
 
-    // Create response with the auth data
-    const nextResponse = NextResponse.json(authData);
+    // Update cookies with new tokens
+    cookieStore.set("access_token", authData.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: authData.expiresIn || 3600, // 1 hour default
+      path: "/",
+    });
 
-    // Update JWT tokens in cookies
-    if (authData.accessToken) {
-      nextResponse.cookies.set("accessToken", authData.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 24 * 60 * 60, // 24 hours
-      });
-    }
+    cookieStore.set("refresh_token", authData.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: "/",
+    });
 
-    if (authData.refreshToken) {
-      nextResponse.cookies.set("refreshToken", authData.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-      });
-    }
+    cookieStore.set("session_id", authData.sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: "/",
+    });
 
-    if (authData.sessionId) {
-      nextResponse.cookies.set("sessionId", authData.sessionId, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-      });
-    }
-
-    return nextResponse;
+    // Return auth data (without sensitive tokens for client storage)
+    return NextResponse.json({
+      ...authData,
+      // Don't send actual tokens to client for security
+      refreshToken: "set-in-cookie",
+    });
   } catch (error) {
-    console.error("Refresh API error:", error);
+    console.error("Refresh token API error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

@@ -1,70 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 export async function GET(request: NextRequest) {
   try {
-    // Get access token from cookie
-    const accessToken = request.cookies.get("accessToken")?.value;
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("access_token")?.value;
 
     if (!accessToken) {
       return NextResponse.json(
-        { message: "No access token found" },
+        { message: "No access token available" },
         { status: 401 }
       );
     }
 
-    const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/profile`;
-
-    // Forward the profile request to the backend with the token
-    const response = await fetch(backendUrl, {
+    const response = await fetch(`${API_BASE}/auth/profile`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
     if (!response.ok) {
-      const error = await response
-        .json()
-        .catch(() => ({ message: "Profile fetch failed" }));
-      return NextResponse.json(error, { status: response.status });
-    }
-
-    // Check if response is actually JSON
-    const contentType = response.headers.get("content-type");
-
-    if (!contentType || !contentType.includes("application/json")) {
-      // Backend returned non-JSON response
-      const textResponse = await response.text();
-
+      const errorData = await response.json().catch(() => ({}));
       return NextResponse.json(
-        {
-          message: "Backend returned invalid response",
-          details: `Expected JSON but got: ${contentType}`,
-          preview: textResponse.substring(0, 100),
-        },
-        { status: 502 }
+        { message: errorData.message || "Failed to get profile" },
+        { status: response.status }
       );
     }
 
-    const profileData = await response.json();
-    return NextResponse.json(profileData);
+    const userData = await response.json();
+    return NextResponse.json(userData);
   } catch (error) {
     console.error("Profile API error:", error);
-
-    // Check if it's a network error (backend not running)
-    if (error instanceof TypeError && error.message.includes("fetch")) {
-      return NextResponse.json(
-        {
-          message: "Backend server not reachable",
-          details: "Make sure the backend is running on port 8080",
-        },
-        { status: 503 }
-      );
-    }
-
     return NextResponse.json(
-      { message: "Internal server error", details: String(error) },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }

@@ -11,21 +11,8 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+
 import {
   CalendarIcon,
   EditIcon,
@@ -34,54 +21,9 @@ import {
   ShieldIcon,
   ClockIcon,
 } from "lucide-react";
-import { format } from "date-fns";
-
-const profileSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email("Please enter a valid email address"),
-});
-
-type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function AccountPage() {
-  const { user, refreshUser } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      username: user?.username || "",
-      email: user?.email || "",
-    },
-  });
-
-  const onSubmit = async (data: ProfileFormData) => {
-    setIsLoading(true);
-    try {
-      // TODO: Implement API call to update user profile
-      console.log("Update profile:", data);
-
-      // For now, just simulate success
-      setTimeout(() => {
-        setIsEditing(false);
-        setIsLoading(false);
-        // Refresh user data after update
-        refreshUser();
-      }, 1000);
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-      setIsLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    form.reset({
-      username: user?.username || "",
-      email: user?.email || "",
-    });
-    setIsEditing(false);
-  };
+  const { user } = useAuth();
 
   if (!user) {
     return (
@@ -110,16 +52,6 @@ export default function AccountPage() {
                 Your personal account details and information.
               </CardDescription>
             </div>
-            {!isEditing && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(true)}
-              >
-                <EditIcon className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Button>
-            )}
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center space-x-4">
@@ -139,118 +71,67 @@ export default function AccountPage() {
 
             <Separator />
 
-            {isEditing ? (
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Username</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="flex items-center text-sm font-medium text-muted-foreground">
+                  <UserIcon className="h-4 w-4 mr-2" />
+                  Username
+                </Label>
+                <p className="text-sm">{user.username}</p>
+              </div>
 
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <div className="space-y-2">
+                <Label className="flex items-center text-sm font-medium text-muted-foreground">
+                  <MailIcon className="h-4 w-4 mr-2" />
+                  Email Address
+                </Label>
+                <p className="text-sm">{user.email}</p>
+              </div>
 
-                  <div className="flex space-x-2">
-                    <Button type="submit" disabled={isLoading}>
-                      {isLoading ? "Saving..." : "Save Changes"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleCancel}
-                      disabled={isLoading}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="flex items-center text-sm font-medium text-muted-foreground">
+                  <ShieldIcon className="h-4 w-4 mr-2" />
+                  Role
+                </Label>
+                <p className="text-sm">{user.role}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="flex items-center text-sm font-medium text-muted-foreground">
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  Member Since
+                </Label>
+                <p className="text-sm">
+                  {new Date(user.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
+
+              {user.lastLoginAt && (
                 <div className="space-y-2">
                   <Label className="flex items-center text-sm font-medium text-muted-foreground">
-                    <UserIcon className="h-4 w-4 mr-2" />
-                    Username
-                  </Label>
-                  <p className="text-sm">{user.username}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="flex items-center text-sm font-medium text-muted-foreground">
-                    <MailIcon className="h-4 w-4 mr-2" />
-                    Email Address
-                  </Label>
-                  <p className="text-sm">{user.email}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="flex items-center text-sm font-medium text-muted-foreground">
-                    <ShieldIcon className="h-4 w-4 mr-2" />
-                    Role
-                  </Label>
-                  <p className="text-sm">{user.role}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="flex items-center text-sm font-medium text-muted-foreground">
-                    <CalendarIcon className="h-4 w-4 mr-2" />
-                    Member Since
+                    <ClockIcon className="h-4 w-4 mr-2" />
+                    Last Login
                   </Label>
                   <p className="text-sm">
-                    {new Date(user.createdAt).toLocaleDateString("en-US", {
+                    {new Date(user.lastLoginAt).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
+                    })}{" "}
+                    at{" "}
+                    {new Date(user.lastLoginAt).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
                     })}
                   </p>
                 </div>
-
-                {user.lastLoginAt && (
-                  <div className="space-y-2">
-                    <Label className="flex items-center text-sm font-medium text-muted-foreground">
-                      <ClockIcon className="h-4 w-4 mr-2" />
-                      Last Login
-                    </Label>
-                    <p className="text-sm">
-                      {new Date(user.lastLoginAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}{" "}
-                      at{" "}
-                      {new Date(user.lastLoginAt).toLocaleTimeString("en-US", {
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hour12: true,
-                      })}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </CardContent>
         </Card>
 

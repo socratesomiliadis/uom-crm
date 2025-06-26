@@ -27,7 +27,8 @@ interface CompanyPageProps {
 }
 
 export default async function CompanyPage({ params }: CompanyPageProps) {
-  const companyId = parseInt(params.id);
+  const { id } = await params;
+  const companyId = parseInt(id);
 
   if (isNaN(companyId)) {
     notFound();

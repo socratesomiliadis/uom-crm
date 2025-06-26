@@ -16,7 +16,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/lib/auth-context";
 import {
   BellIcon,
   CreditCardIcon,
@@ -27,6 +26,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -51,7 +51,7 @@ export function NavUser() {
   const handleLogoutAll = async () => {
     setIsLoggingOut(true);
     try {
-      await logout(true);
+      await logout();
     } catch (error) {
       console.error("Logout all failed:", error);
     } finally {
@@ -110,14 +110,6 @@ export function NavUser() {
                   <UserIcon />
                   Account
                 </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

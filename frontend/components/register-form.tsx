@@ -2,49 +2,43 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthResponse } from "@/lib/api/types";
+import { registerAction } from "@/lib/auth-actions";
 import Link from "next/link";
 
 export default function RegisterForm() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [passwordHash, setPasswordHash] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
 
     const emailHost = email.split("@")[1];
-    // if (emailHost !== "curema.com") {
-    //   setError("You must use a curema.com email address");
-    //   return;
-    // }
+    if (emailHost !== "curema.com") {
+      setError("You must use a curema.com email address");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, email, passwordHash }),
-        }
-      );
-      if (!res.ok) {
-        const error = await res
-          .json()
-          .catch(() => ({ message: "Registration failed" }));
-        throw new Error(error.message || "Registration failed");
-      }
+      const result = await registerAction(username, email, password);
 
-      // Registration successful, redirect to login
-      router.push("/");
+      if (result.success) {
+        // Registration successful, redirect to login
+        router.push("/");
+      } else {
+        setError(result.error || "Registration failed");
+      }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Registration failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,8 +106,8 @@ export default function RegisterForm() {
           <input
             type={showPassword ? "text" : "password"}
             autoComplete="new-password"
-            value={passwordHash}
-            onChange={(e) => setPasswordHash(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
             className="text-black border-[1px] border-black/60 rounded-xl px-4 py-4 text-lg focus:outline-none"
           />
@@ -159,9 +153,10 @@ export default function RegisterForm() {
         </div>
         <button
           type="submit"
-          className="w-full cursor-pointer py-4 text-white bg-[#131313] rounded-xl"
+          disabled={isLoading}
+          className="w-full cursor-pointer py-4 text-white bg-[#131313] rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Continue
+          {isLoading ? "Creating account..." : "Continue"}
         </button>
         {error && <p className="text-red-500 absolute -bottom-8">{error}</p>}
       </form>
