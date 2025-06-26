@@ -1,673 +1,429 @@
 # CRM Application
 
-A full-stack Customer Relationship Management (CRM) system built with:
+A full-stack Customer Relationship Management (CRM) system built with modern technologies and containerized for easy deployment.
 
-- **Backend**: Spring Boot (Java 17), Spring Data JPA, Spring Security (JWT), PostgreSQL
-- **Frontend**: Next.js (App Router) + React (TypeScript), Tailwind CSS, shadcn/ui, Recharts
-- **Containerization**: Docker & Docker Compose
+## 🚀 Quick Start with Docker
 
-This project provides a REST API for managing contacts, companies, opportunities, and activities, along with a modern React/TypeScript frontend that consumes those endpoints in a type-safe manner.
+**The easiest way to run the entire application:**
 
----
-
-## Table of Contents
-
-1. [Features](#features)
-2. [Tech Stack](#tech-stack)
-3. [Prerequisites](#prerequisites)
-4. [Project Structure](#project-structure)
-5. [Getting Started (Local Development)](#getting-started-local-development)
-
-   - [Backend Setup](#backend-setup)
-   - [Frontend Setup](#frontend-setup)
-
-6. [Running with Docker Compose](#running-with-docker-compose)
-7. [Database Seeding](#database-seeding)
-8. [API Endpoints](#api-endpoints)
-9. [Frontend–Backend Integration](#frontend–backend-integration)
-
-   - [TypeScript Types & API Helpers](#typescript-types--api-helpers)
-
-10. [Testing](#testing)
-11. [Environment Variables](#environment-variables)
-12. [Contributing](#contributing)
-13. [License](#license)
-
----
-
-## Features
-
-- **User Authentication & Authorization**
-
-  - JWT-based login/register
-  - Role-based access (ADMIN, SALES, MANAGER)
-
-- **Contacts Management**
-
-  - Create, Read, Update, Delete (CRUD) contacts
-  - Associate contacts with companies
-
-- **Companies Management**
-
-  - CRUD for companies (accounts)
-
-- **Opportunities (Deals)**
-
-  - Track pipeline stages (NEW, QUALIFIED, PROPOSAL, NEGOTIATION, WON, LOST)
-  - Associate opportunities with contacts
-
-- **Activities & Tasks**
-
-  - Log calls, emails, meetings, notes, tasks
-  - Mark tasks as completed, set due dates
-  - Associate activities with contacts and users
-
-- **Dashboard**
-
-  - Summary cards (Total Contacts, Open Deals, Activities Today, New Leads)
-  - “Deals by Stage” chart with Recharts (pie chart)
-  - Recent Activities table
-  - Contacts list table
-
-- **Type-Safe API Integration**
-
-  - Shared TypeScript interfaces matching Java DTOs
-  - `fetchDirect<T>` (server) & `fetchClient<T>` (client) helpers returning typed data
-
-- **Containerized**
-
-  - Dockerfiles for backend and frontend
-  - `docker-compose.yml` to orchestrate Postgres, Spring Boot, and Next.js
-
----
-
-## Tech Stack
-
-- **Backend**
-
-  - Java 17
-  - Spring Boot 3 (Web, Data JPA, Security)
-  - PostgreSQL 15
-  - JWT (io.jsonwebtoken\:jjwt)
-  - Hibernate (JPA)
-  - Maven build
-  - Lombok (optional, for boilerplate reduction)
-
-- **Frontend**
-
-  - Next.js 13+ (App Router)
-  - React 18+ (TypeScript)
-  - Tailwind CSS
-  - shadcn/ui (UI components)
-  - lucide-react (icons)
-  - Recharts (data visualization)
-  - Axios or built-in `fetch` for HTTP calls
-
-- **Dev Tools**
-
-  - Docker & Docker Compose
-  - psql / pgAdmin (Postgres client)
-  - Postman or Insomnia (API testing)
-
----
-
-## Prerequisites
-
-1. **Java 17** (JDK)
-2. **Maven 3.8+**
-3. **Node.js 18+** & **Yarn** (or npm)
-4. **Docker** & **Docker Compose** (for containerized development)
-5. **PostgreSQL** (local installation if not using Docker)
-6. (Optional) **Postman** or **Insomnia** for testing REST endpoints
-
----
-
-## Project Structure
-
+```bash
+git clone <your-repo-url>
+cd uom-crm
+docker compose up --build
 ```
-project-root/
-├── backend/                      # Spring Boot application
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/example/crm/
-│   │   │   │   ├── CrmBackendApplication.java
-│   │   │   │   ├── config/       # SecurityConfig, JwtTokenProvider, CORS, Seeder
-│   │   │   │   ├── controller/   # REST controllers (Auth, Contacts, Companies, etc.)
-│   │   │   │   ├── dto/          # Data Transfer Objects (AuthRequest, CompanyDto, etc.)
-│   │   │   │   ├── model/        # Entities & Enums (User, Contact, Company, etc.)
-│   │   │   │   ├── repository/   # Spring Data JPA Repositories
-│   │   │   │   └── service/      # Business logic services
-│   │   │   └── resources/
-│   │   │       ├── application.properties
-│   │   │       └── data.sql      # (Optional) SQL seed data
-│   │   └── test/                 # Unit/integration tests
-│   └── pom.xml                   # Maven POM
-│   └── Dockerfile                # Build & package Spring Boot into a JAR
-│
-├── frontend/                     # Next.js + React (TypeScript)
-│   ├── app/                      # App Router pages
-│   │   ├── layout.tsx            # Root layout (Sidebar, Header)
-│   │   ├── page.tsx              # Dashboard (Server Component)
-│   │   ├── login/page.tsx        # Login (Client Component)
-│   │   ├── contacts/
-│   │   │   ├── page.tsx          # Contacts list (Server Comp)
-│   │   │   └── [id]/             # Dynamic: view & edit contact
-│   │   │       ├── page.tsx      # Contact detail (Server Comp)
-│   │   │       └── edit.tsx      # Edit Contact form (Client Comp)
-│   │   ├── companies/            # Similar structure for companies
-│   │   ├── opportunities/
-│   │   └── activities/
-│   ├── components/               # Shared UI components (Sidebar, Header, Tables, etc.)
-│   ├── lib/                      # API helper (fetchDirect, fetchClient)
-│   ├── types/                    # Shared TS interfaces (CompanyDto, ContactDto, etc.)
-│   ├── public/                   # Static assets (favicon, images)
-│   ├── Dockerfile                # Build Next.js production image
-│   ├── next.config.js            # Next.js configuration
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── docker-compose.yml            # Orchestrate Postgres, backend, frontend
-└── README.md                     # ← You are here
+
+Then access:
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8080/api
+- **Database**: localhost:5432 (user: crm_user, password: secret)
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend**: Spring Boot 3 (Java 17), Spring Security with JWT, PostgreSQL, Maven
+- **Frontend**: Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, shadcn/ui
+- **Authentication**: Enhanced JWT system with access tokens (15 min) + refresh tokens (7 days)
+- **Containerization**: Docker & Docker Compose for one-command deployment
+- **Database**: PostgreSQL 15 with automatic schema management
+
+---
+
+## ✨ Key Features
+
+### 🔐 Advanced Authentication & Security
+
+- **Dual Token System**: Short-lived access tokens (15 minutes) + long-lived refresh tokens (7 days)
+- **Automatic Token Refresh**: Seamless token renewal without user intervention
+- **Session Management**: Track and limit concurrent user sessions (max 3 per user)
+- **Role-based Access Control**: ADMIN, SALES, MANAGER roles
+- **Secure Token Storage**: HttpOnly cookies + localStorage for optimal security
+- **Token Cleanup**: Automatic removal of expired tokens
+
+### 📊 Complete CRM Functionality
+
+- **Contacts Management**: Full CRUD with company associations
+- **Companies Management**: Track customer accounts and organizations
+- **Opportunities Pipeline**: Manage deals through stages (NEW → QUALIFIED → PROPOSAL → NEGOTIATION → WON/LOST)
+- **Activities & Tasks**: Log calls, emails, meetings, notes with due dates and completion tracking
+- **Interactive Dashboard**: Real-time metrics, charts, and recent activity summaries
+
+### 🎨 Modern UI/UX
+
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Dark/Light Mode**: User preference with system sync
+- **Data Tables**: Sortable, filterable tables with pagination
+- **Charts & Analytics**: Interactive charts using Recharts
+- **Type-safe API**: End-to-end TypeScript for robust data handling
+
+### 🐳 Production-Ready Deployment
+
+- **One-Command Setup**: `docker compose up --build`
+- **Multi-stage Docker builds**: Optimized images for production
+- **Data Persistence**: PostgreSQL data survives container restarts
+- **Environment Configuration**: Flexible configuration for development and production
+
+---
+
+## 📋 Table of Contents
+
+1. [Quick Start with Docker](#-quick-start-with-docker)
+2. [Authentication System](#-authentication-system)
+3. [Local Development Setup](#-local-development-setup)
+4. [API Documentation](#-api-documentation)
+5. [Project Structure](#-project-structure)
+6. [Environment Configuration](#-environment-configuration)
+7. [Troubleshooting](#-troubleshooting)
+
+---
+
+## 🔐 Authentication System
+
+The application uses an enhanced JWT authentication system with the following features:
+
+### Token Types
+
+- **Access Token**: Short-lived (15 minutes), used for API requests
+- **Refresh Token**: Long-lived (7 days), used to obtain new access tokens
+
+### Security Configuration
+
+```properties
+# Access Token Configuration
+jwt.access-token.secret=<secure-secret-key>
+jwt.access-token.expiration-minutes=15
+
+# Refresh Token Configuration
+jwt.refresh-token.secret=<secure-refresh-secret>
+jwt.refresh-token.expiration-days=7
+jwt.max-active-refresh-tokens-per-user=5
+
+# Session Management
+session.max-active-sessions-per-user=3
+session.timeout-minutes=30
+```
+
+### Token Flow
+
+1. **Login**: User receives both access and refresh tokens
+2. **API Requests**: Access token in Authorization header
+3. **Token Refresh**: Automatic renewal when access token expires
+4. **Logout**: Both tokens are invalidated and cleaned up
+
+### Security Features
+
+- **Concurrent Session Limits**: Maximum 3 active sessions per user
+- **Refresh Token Limits**: Maximum 5 active refresh tokens per user
+- **Automatic Cleanup**: Expired tokens are automatically removed
+- **Secure Storage**: Tokens stored in HttpOnly cookies and localStorage
+
+### Usage Example
+
+```javascript
+// Frontend automatically handles token refresh
+const contacts = await fetchClient<ContactDto[]>('/contacts');
+// No manual token management needed!
 ```
 
 ---
 
-## Getting Started (Local Development)
+## 🏠 Local Development Setup
 
-Below are instructions for running both backend and frontend locally (without Docker). If you prefer a containerized setup, skip to [Running with Docker Compose](#running-with-docker-compose).
+### Prerequisites
 
-### Backend Setup
+- **Java 17** (JDK)
+- **Maven 3.8+**
+- **Node.js 18+** & **pnpm** (or npm/yarn)
+- **Docker** & **Docker Compose** (recommended)
+- **PostgreSQL 15** (if not using Docker)
 
-1. **Configure PostgreSQL**
+### Option 1: Docker (Recommended)
 
-   - Install PostgreSQL (v13+ recommended) on your machine.
-   - Create a database called `crm`.
-   - Create a database user `crm_user` with password `secret` (you can change these, but update `application.properties` accordingly).
-
-   ```sql
-   CREATE DATABASE crm;
-   CREATE USER crm_user WITH ENCRYPTED PASSWORD 'secret';
-   GRANT ALL PRIVILEGES ON DATABASE crm TO crm_user;
-   ```
-
-2. **Clone & Build**
+1. **Clone and start everything**:
 
    ```bash
-   git clone <this-repo-url>
-   cd <repo-root>/backend
+   git clone <your-repo-url>
+   cd uom-crm
+   docker compose up --build
    ```
 
-3. **Configure `application.properties`** (in `src/main/resources`)
-   By default, it uses:
+2. **Access the application**:
 
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/crm
-   spring.datasource.username=crm_user
-   spring.datasource.password=secret
+   - Frontend: http://localhost:3000
+   - Backend: http://localhost:8080/api
+   - Database: localhost:5432
 
-   spring.jpa.hibernate.ddl-auto=update
-   spring.jpa.show-sql=true
+3. **Create your first user**:
+   - Navigate to http://localhost:3000/register
+   - Create an account
+   - Login and start using the CRM!
 
-   jwt.secret=VerySecretKeyForJwtSigning1234567890
-   jwt.expiration-ms=86400000   # 1 day in ms
+### Option 2: Local Development
 
-   spring.security.user.name=admin
-   spring.security.user.password=admin
-   ```
-
-   - If you change DB credentials or JWT settings, update here or set environment variables (see [Environment Variables](#environment-variables)).
-
-4. **(Optional) Seed Database**
-
-   - **Option A: `data.sql`**
-     In `src/main/resources/data.sql`, add INSERT statements. On startup, Spring Boot will run them automatically.
-   - **Option B: Java Seeder**
-     A `DatabaseSeeder` bean (implements `ApplicationRunner`) seeds if tables are empty. No additional config needed—just restart the app.
-
-5. **Run the Backend**
-
-   ```bash
-   mvn clean package
-   mvn spring-boot:run
-   ```
-
-   - The API will be available at **`http://localhost:8080/api`**.
-   - Check logs to ensure it connected to Postgres, created tables, and (if seeder active) inserted initial data.
-
-6. **Verify with cURL / Postman**
-
-   - **Register a new user**
-
-     ```bash
-     curl -X POST http://localhost:8080/api/auth/register \
-       -H "Content-Type: application/json" \
-       -d '{"username":"testuser","email":"test@example.com","passwordHash":"password123"}'
-     ```
-
-   - **Login**
-
-     ```bash
-     curl -X POST http://localhost:8080/api/auth/login \
-       -H "Content-Type: application/json" \
-       -d '{"username":"testuser","password":"password123"}'
-     ```
-
-     → Returns `{ "token": "<jwt_token_here>" }`.
-
-   - **Protected Endpoint (Get Contacts)**
-
-     ```bash
-     curl -H "Authorization: Bearer <jwt_token_here>" \
-       http://localhost:8080/api/contacts
-     ```
-
----
-
-### Frontend Setup
-
-1. **Navigate to Frontend**
-
-   ```bash
-   cd <repo-root>/frontend
-   ```
-
-2. **Install Dependencies**
-
-   ```bash
-   yarn install
-   # or: npm install
-   ```
-
-3. **Configure Environment Variables**
-   Create a `.env.local` in `frontend/`:
-
-   ```env
-   NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
-   NEXT_PUBLIC_JWT_COOKIE_NAME=crm_jwt
-   ```
-
-   - These settings tell Next.js where to find your Spring Boot API and what cookie name holds the JWT.
-
-4. **Run Development Server**
-
-   ```bash
-   yarn dev
-   # or: npm run dev
-   ```
-
-   - The app will be available at **`http://localhost:3000`**.
-   - You should see the login page.
-
-5. **Login Flow**
-
-   - Navigate to `http://localhost:3000/login`.
-   - Enter the credentials you registered via Postman (e.g., `testuser` / `password123`).
-   - On success, Next.js stores the JWT in `localStorage` & cookie, then redirects to `/` (Dashboard).
-
-6. **Navigate the App**
-
-   - **Dashboard** (`/`)
-   - **Contacts** (`/contacts`)
-   - **Add Contact** (`/contacts/new`)
-   - **View Contact** (`/contacts/:id`)
-   - **Edit Contact** (`/contacts/:id/edit`)
-   - Similarly for **Companies**, **Opportunities**, and **Activities**.
-
----
-
-## Running with Docker Compose
-
-If you prefer a containerized environment (recommended for ease of setup and consistent environments), follow these steps:
-
-1. **Ensure Docker & Docker Compose are installed**
-
-   - [Docker Desktop](https://www.docker.com/products/docker-desktop) (Windows, macOS) or Docker Engine & Compose (Linux).
-
-2. **Place `docker-compose.yml` at Project Root**
-   Example `docker-compose.yml`:
-
-   ```yaml
-   version: "3.8"
-
-   services:
-     db:
-       image: postgres:15
-       restart: always
-       environment:
-         POSTGRES_DB: crm
-         POSTGRES_USER: crm_user
-         POSTGRES_PASSWORD: secret
-       volumes:
-         - db-data:/var/lib/postgresql/data
-       ports:
-         - "5432:5432"
-
-     backend:
-       build:
-         context: ./backend
-         dockerfile: Dockerfile
-       container_name: crm-backend
-       restart: on-failure
-       environment:
-         SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/crm
-         SPRING_DATASOURCE_USERNAME: crm_user
-         SPRING_DATASOURCE_PASSWORD: secret
-         SPRING_JPA_HIBERNATE_DDL_AUTO: update
-         SPRING_PROFILES_ACTIVE: docker
-         JWT_SECRET: VerySecretKeyForJwtSigning1234567890
-         JWT_EXPIRATION_MS: 86400000
-       ports:
-         - "8080:8080"
-       depends_on:
-         - db
-
-     frontend:
-       build:
-         context: ./frontend
-         dockerfile: Dockerfile
-       container_name: crm-frontend
-       restart: on-failure
-       environment:
-         NEXT_PUBLIC_API_BASE_URL: http://backend:8080/api
-         NEXT_PUBLIC_JWT_COOKIE_NAME: crm_jwt
-       ports:
-         - "3000:3000"
-       depends_on:
-         - backend
-
-   volumes:
-     db-data:
-   ```
-
-3. **Build & Start All Services**
-   From project root (where `docker-compose.yml` resides):
-
-   ```bash
-   docker-compose up --build
-   ```
-
-   - This will spin up:
-
-     1. **PostgreSQL** (`db`)
-     2. **Spring Boot** backend (`backend`)
-     3. **Next.js** frontend (`frontend`)
-
-4. **Access the Application**
-
-   - Frontend: [http://localhost:3000](http://localhost:3000)
-   - Backend API (for testing): [http://localhost:8080/api](http://localhost:8080/api)
-   - PostgreSQL on host `localhost:5432` using `crm_user` / `secret`.
-
-5. **Stopping Containers**
-
-   ```bash
-   docker-compose down
-   ```
-
-   - This removes the containers but preserves the `db-data` volume (data persists).
-   - To completely remove volumes:
-
-     ```bash
-     docker-compose down --volumes
-     ```
-
----
-
-## Database Seeding
-
-You can seed the database automatically in two ways:
-
-### 1. Using `data.sql`
-
-- Place a `data.sql` file in `backend/src/main/resources/`.
-- On application startup (with `spring.jpa.hibernate.ddl-auto=update` or `create`), Spring Boot runs `data.sql` and executes all INSERT statements.
-- Example `data.sql` (simplified):
-
-  ```sql
-  INSERT INTO users (username, email, password_hash, role, created_at, updated_at)
-  VALUES ('admin','admin@example.com','$2a$10$7qGflXlU8.hM7xIh8qwoNeQCqMoxQaG98rZcYF5m7hxQN6nFGoYmK','ADMIN',NOW(),NOW());
-
-  INSERT INTO companies (name, industry, website, city, country, created_at, updated_at)
-  VALUES ('Acme Corp','Manufacturing','https://acme.example.com','Metropolis','USA',NOW(),NOW());
-
-  INSERT INTO contacts (company_id, first_name, last_name, email, phone, job_title, created_at, updated_at)
-  VALUES (1,'Jane','Doe','jane.doe@acme.example.com','555-1234','Procurement Manager',NOW(),NOW());
-
-  INSERT INTO opportunities (contact_id, title, amount, stage, close_date, created_at, updated_at)
-  VALUES (1,'Q3 Widget Order',25000.00,'NEW','2025-09-30',NOW(),NOW());
-
-  INSERT INTO activities (contact_id, user_id, type, subject, description, activity_date, due_date, completed, created_at, updated_at)
-  VALUES (1,1,'CALL','Intro Call','Discussed specs',NOW(),NOW() + INTERVAL '2 days',FALSE,NOW(),NOW());
-  ```
-
-### 2. Using `DatabaseSeeder` (Java)
-
-- A Spring component (`@Component`) that implements `ApplicationRunner`.
-- Checks if tables are empty, then uses JPA repositories to insert default data programmatically.
-- Runs automatically on application startup (unless a specific profile excludes it).
-
----
-
-## API Endpoints
-
-### Authentication
-
-| Method | URL                  | Description         | Request Body                              | Response                                       |
-| ------ | -------------------- | ------------------- | ----------------------------------------- | ---------------------------------------------- |
-| POST   | `/api/auth/register` | Register a new user | `{ "username", "email", "passwordHash" }` | `200 OK` (text “User registered successfully”) |
-| POST   | `/api/auth/login`    | Login & receive JWT | `{ "username", "password" }`              | `{ "token": "<jwt_token>" }`                   |
-
-### Companies
-
-| Method | URL                   | Description             | Request Body (JSON)  | Response         |
-| ------ | --------------------- | ----------------------- | -------------------- | ---------------- |
-| GET    | `/api/companies`      | List all companies      | —                    | `CompanyDto[]`   |
-| GET    | `/api/companies/{id}` | Get company by ID       | —                    | `CompanyDto`     |
-| POST   | `/api/companies`      | Create new company      | `CompanyDto` (no ID) | `CompanyDto`     |
-| PUT    | `/api/companies/{id}` | Update existing company | `CompanyDto`         | `CompanyDto`     |
-| DELETE | `/api/companies/{id}` | Delete company          | —                    | `204 No Content` |
-
-### Contacts
-
-| Method | URL                           | Description             | Request Body (JSON)  | Response         |
-| ------ | ----------------------------- | ----------------------- | -------------------- | ---------------- |
-| GET    | `/api/contacts`               | List all contacts       | —                    | `ContactDto[]`   |
-| GET    | `/api/contacts/company/{cid}` | Contacts by company ID  | —                    | `ContactDto[]`   |
-| GET    | `/api/contacts/{id}`          | Get contact by ID       | —                    | `ContactDto`     |
-| POST   | `/api/contacts`               | Create new contact      | `ContactDto` (no ID) | `ContactDto`     |
-| PUT    | `/api/contacts/{id}`          | Update existing contact | `ContactDto`         | `ContactDto`     |
-| DELETE | `/api/contacts/{id}`          | Delete contact          | —                    | `204 No Content` |
-
-### Opportunities
-
-| Method | URL                                | Description                 | Request Body (JSON)      | Response           |
-| ------ | ---------------------------------- | --------------------------- | ------------------------ | ------------------ |
-| GET    | `/api/opportunities`               | List all opportunities      | —                        | `OpportunityDto[]` |
-| GET    | `/api/opportunities/contact/{cid}` | By contact ID               | —                        | `OpportunityDto[]` |
-| GET    | `/api/opportunities/stage/{stage}` | By stage (enum in path)     | —                        | `OpportunityDto[]` |
-| GET    | `/api/opportunities/{id}`          | Get opportunity by ID       | —                        | `OpportunityDto`   |
-| POST   | `/api/opportunities`               | Create new opportunity      | `OpportunityDto` (no ID) | `OpportunityDto`   |
-| PUT    | `/api/opportunities/{id}`          | Update existing opportunity | `OpportunityDto`         | `OpportunityDto`   |
-| DELETE | `/api/opportunities/{id}`          | Delete opportunity          | —                        | `204 No Content`   |
-
-### Activities
-
-| Method | URL                             | Description               | Request Body (JSON)   | Response         |
-| ------ | ------------------------------- | ------------------------- | --------------------- | ---------------- |
-| GET    | `/api/activities`               | List all activities       | —                     | `ActivityDto[]`  |
-| GET    | `/api/activities/contact/{cid}` | By contact ID             | —                     | `ActivityDto[]`  |
-| GET    | `/api/activities/pending`       | Incomplete tasks due soon | —                     | `ActivityDto[]`  |
-| GET    | `/api/activities/{id}`          | Get activity by ID        | —                     | `ActivityDto`    |
-| POST   | `/api/activities`               | Create new activity       | `ActivityDto` (no ID) | `ActivityDto`    |
-| PUT    | `/api/activities/{id}`          | Update existing activity  | `ActivityDto`         | `ActivityDto`    |
-| DELETE | `/api/activities/{id}`          | Delete activity           | —                     | `204 No Content` |
-
-> **All endpoints except `/api/auth/**`require a valid`Authorization: Bearer <token>` header.\*\*
-
----
-
-## Frontend–Backend Integration
-
-### React Environment
-
-- **Server Components** (inside `/app` directory) use `fetchDirect<T>(path)` to call the backend and automatically attach JWT from cookies.
-- **Client Components** use `fetchClient<T>(path)` to read JWT from `localStorage` and attach it to requests.
-
-This ensures **type-safe** data fetching; for example:
-
-```ts
-import { ContactDto } from "../types/api";
-
-// In a Server Component (e.g. app/contacts/page.tsx):
-const contacts: ContactDto[] = await fetchDirect<ContactDto[]>("/contacts");
-
-// In a Client Component:
-fetchClient<ContactDto[]>("/contacts").then((data) => {
-  /* data is typed as ContactDto[] */
-});
-```
-
----
-
-### TypeScript Types & API Helpers
-
-1. **`types/api.ts`**
-   Shared TS interfaces that mirror Java DTOs (e.g. `ContactDto`, `CompanyDto`, `OpportunityDto`, `ActivityDto`, `AuthResponse`).
-
-   ```ts
-   export interface ContactDto {
-     id: number;
-     companyId?: number | null;
-     firstName: string;
-     lastName: string;
-     email: string;
-     phone?: string | null;
-     jobTitle?: string | null;
-     createdAt: string;
-     updatedAt: string;
-   }
-   // … other interfaces …
-   ```
-
-2. **`lib/api.ts`**
-
-   - `fetchDirect<T>(path, options?)`: Server-side fetch, reads JWT cookie via `cookies()` (Next.js).
-   - `fetchClient<T>(path, options?)`: Client-side fetch, reads JWT from `localStorage`.
-     Both return `Promise<T>` and throw `Error` on non-2xx.
-
----
-
-## Testing
-
-### Backend Tests
-
-- Located under `backend/src/test/java/com/example/crm`.
-- uses **JUnit 5** and **Spring Boot Test** for unit and integration tests.
-- Example: `CompanyServiceTest.java` verifies CRUD on companies.
-
-Run all tests:
+#### Backend Setup
 
 ```bash
 cd backend
-mvn test
+
+# Configure PostgreSQL
+createdb crm
+createuser crm_user --password secret
+
+# Build and run
+mvn clean package
+mvn spring-boot:run
 ```
 
-### Frontend Tests
+#### Frontend Setup
 
-- Use **Jest** + **React Testing Library** for unit‐testing components.
-- Tests live under `frontend/src/__tests__` or adjacent to components with `.test.tsx`.
-- Run:
+```bash
+cd frontend
 
-  ```bash
-  cd frontend
-  yarn test
-  # or: npm test
-  ```
+# Install dependencies
+pnpm install
 
-- For end‐to‐end (E2E) testing, consider adding **Cypress** or **Playwright**. (Not included by default.)
+# Configure environment
+echo "NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api" > .env.local
+echo "NEXT_PUBLIC_JWT_COOKIE_NAME=crm_jwt" >> .env.local
+
+# Start development server
+pnpm dev
+```
 
 ---
 
-## Environment Variables
+## 📡 API Documentation
 
-### Backend (`application.properties` or environment overrides)
+### Authentication Endpoints
 
-| Prop Key                        | Default/Example                        | Description                                  |
-| ------------------------------- | -------------------------------------- | -------------------------------------------- |
-| `spring.datasource.url`         | `jdbc:postgresql://localhost:5432/crm` | JDBC URL for Postgres                        |
-| `spring.datasource.username`    | `crm_user`                             | DB username                                  |
-| `spring.datasource.password`    | `secret`                               | DB password                                  |
-| `spring.jpa.hibernate.ddl-auto` | `update`                               | `none` / `update` / `create` / `create-drop` |
-| `jwt.secret`                    | `VerySecretKeyForJwtSigning1234567890` | Secret key for JWT signing                   |
-| `jwt.expiration-ms`             | `86400000`                             | Token validity in milliseconds               |
-| `spring.profiles.active`        | `dev` (or `docker` in Docker Compose)  | Active Spring Boot profile                   |
-| `spring.security.user.name`     | `admin`                                | Default in-memory user (for testing)         |
-| `spring.security.user.password` | `admin`                                | Default in-memory user’s password            |
+| Method | Endpoint             | Description          | Request Body                        | Response                        |
+| ------ | -------------------- | -------------------- | ----------------------------------- | ------------------------------- |
+| POST   | `/api/auth/register` | Register new user    | `{ username, email, passwordHash }` | `200 OK`                        |
+| POST   | `/api/auth/login`    | Login user           | `{ username, password }`            | `{ accessToken, refreshToken }` |
+| POST   | `/api/auth/refresh`  | Refresh access token | `{ refreshToken }`                  | `{ accessToken, refreshToken }` |
+| POST   | `/api/auth/logout`   | Logout user          | -                                   | `200 OK`                        |
+| GET    | `/api/auth/profile`  | Get user profile     | -                                   | `UserInfoDto`                   |
 
-You can also override in `docker-compose.yml` under the `environment:` block.
+### Core Entities
 
-### Frontend (`.env.local`)
+| Entity            | Base Endpoint        | Key Features                                           |
+| ----------------- | -------------------- | ------------------------------------------------------ |
+| **Companies**     | `/api/companies`     | CRUD operations, search, industry filtering            |
+| **Contacts**      | `/api/contacts`      | CRUD operations, company association, search           |
+| **Opportunities** | `/api/opportunities` | CRUD operations, stage management, revenue tracking    |
+| **Activities**    | `/api/activities`    | CRUD operations, task management, calendar integration |
 
-```env
+### Enhanced Endpoints
+
+| Method | Endpoint                           | Description                   |
+| ------ | ---------------------------------- | ----------------------------- |
+| GET    | `/api/contacts/company/{id}`       | Get contacts by company       |
+| GET    | `/api/opportunities/stage/{stage}` | Get opportunities by stage    |
+| GET    | `/api/activities/pending`          | Get incomplete tasks due soon |
+| GET    | `/api/activities/contact/{id}`     | Get activities for contact    |
+
+### Response Format
+
+```json
+{
+  "id": 1,
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "companyId": 1,
+  "jobTitle": "Sales Manager",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}
+```
+
+**All endpoints (except `/api/auth/*`) require `Authorization: Bearer <access_token>` header.**
+
+---
+
+## 📁 Project Structure
+
+```
+uom-crm/
+├── 🐳 docker-compose.yml          # One-command deployment
+├── 📖 DOCKER_README.md           # Detailed Docker instructions
+│
+├── 🌱 backend/                    # Spring Boot API
+│   ├── 🐳 Dockerfile             # Backend container
+│   ├── 📝 .dockerignore          # Docker build optimization
+│   ├── 🔧 pom.xml                # Maven dependencies
+│   └── src/main/java/com/example/crm/
+│       ├── 🚀 CrmBackendApplication.java
+│       ├── ⚙️ config/            # Security, JWT, CORS, Exception handling
+│       │   ├── SecurityConfig.java
+│       │   ├── JwtTokenProvider.java
+│       │   ├── JwtAuthenticationFilter.java
+│       │   ├── CustomUserDetailsService.java
+│       │   └── GlobalExceptionHandler.java
+│       ├── 🎮 controller/        # REST API controllers
+│       │   ├── AuthController.java
+│       │   ├── ContactController.java
+│       │   ├── CompanyController.java
+│       │   ├── OpportunityController.java
+│       │   └── ActivityController.java
+│       ├── 📦 dto/               # Data Transfer Objects
+│       ├── 🏗️ model/             # JPA Entities and Enums
+│       │   ├── User.java
+│       │   ├── RefreshToken.java
+│       │   ├── UserSession.java
+│       │   └── enums/
+│       ├── 🗄️ repository/        # Data Access Layer
+│       └── 🔧 service/           # Business Logic
+│           ├── AuthService.java
+│           ├── RefreshTokenService.java
+│           ├── SessionService.java
+│           └── TokenCleanupService.java
+│
+└── 🖥️ frontend/                   # Next.js Application
+    ├── 🐳 Dockerfile             # Frontend container (multi-stage)
+    ├── 📝 .dockerignore          # Docker build optimization
+    ├── 📦 package.json           # Node.js dependencies
+    ├── ⚙️ next.config.ts         # Next.js configuration (standalone output)
+    ├── 📱 app/                   # App Router pages
+    │   ├── 🏠 page.tsx           # Dashboard with metrics
+    │   ├── 🔐 api/auth/          # Auth API routes
+    │   ├── 📋 dashboard/         # Protected dashboard pages
+    │   │   ├── layout.tsx        # Dashboard layout with sidebar
+    │   │   ├── 👥 contacts/      # Contact management
+    │   │   ├── 🏢 companies/     # Company management
+    │   │   ├── 💼 opportunities/ # Deal pipeline
+    │   │   └── 📋 activities/    # Task management
+    │   └── 📝 register/          # User registration
+    ├── 🧩 components/            # Reusable UI components
+    │   ├── ui/                   # shadcn/ui components
+    │   ├── app-sidebar.tsx       # Navigation sidebar
+    │   ├── protected-route.tsx   # Route protection
+    │   └── theme-toggle.tsx      # Dark/light mode
+    ├── 🔗 lib/                   # API helpers and utilities
+    │   ├── api/                  # Type-safe API clients
+    │   ├── auth-context.tsx      # Authentication context
+    │   └── utils.ts              # Utility functions
+    └── 🎨 public/               # Static assets
+```
+
+---
+
+## ⚙️ Environment Configuration
+
+### Backend Configuration (application.properties)
+
+```properties
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/crm
+spring.datasource.username=crm_user
+spring.datasource.password=secret
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# Enhanced JWT Configuration
+jwt.access-token.secret=VerySecretKeyForAccessTokenSigning1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+jwt.access-token.expiration-minutes=15
+jwt.refresh-token.secret=VerySecretKeyForRefreshTokenSigning0987654321FEDCBAZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqponmlkjihgfedcba9876543210
+jwt.refresh-token.expiration-days=7
+jwt.max-active-refresh-tokens-per-user=5
+
+# Session Configuration
+session.max-active-sessions-per-user=3
+session.timeout-minutes=30
+
+# Logging
+logging.level.com.example.crm.service=DEBUG
+logging.level.com.example.crm.config=DEBUG
+
+# Server Configuration
+server.error.include-message=always
+server.error.include-binding-errors=always
+```
+
+### Frontend Configuration (.env.local)
+
+```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
-NEXT_PUBLIC_JWT_COOKIE_NAME=crm_jwt
 ```
 
-- `NEXT_PUBLIC_API_BASE_URL`: Base URL for all API calls (read by both server & client).
-- `NEXT_PUBLIC_JWT_COOKIE_NAME`: Name of the cookie to store JWT for SSR token retrieval.
+### Docker Environment
+
+All configuration is automatically handled in `docker-compose.yml`:
+
+- PostgreSQL database with persistent volume
+- Backend with proper database connection
+- Frontend with API endpoint configuration
+- Secure JWT secrets for production
 
 ---
 
-## Contributing
+## 🐛 Troubleshooting
 
-Contributions are welcome! Please follow these guidelines:
+### Common Issues
 
-1. **Fork the Repository**
-   Create your own fork, clone it locally, and create a feature branch:
+**Port Conflicts**
 
-   ```bash
-   git clone https://github.com/your-username/uom-crm.git
-   cd uom-crm
-   git checkout -b feature/your-feature
-   ```
+```bash
+# Check what's using the ports
+lsof -i :3000 :5432 :8080
 
-2. **Make Changes & Commit**
+# Stop conflicting services
+sudo kill -9 <PID>
+```
 
-   - Follow the [project structure](#project-structure).
-   - Write meaningful commit messages.
-   - Format code according to established style (Maven Checkstyle for Java, Prettier/ESLint for frontend).
+**Docker Issues**
 
-3. **Run Tests**
+```bash
+# Clean rebuild everything
+docker compose down -v
+docker system prune -f
+docker compose up --build
 
-   ```bash
-   # Backend
-   cd backend
-   mvn test
+# Check specific service logs
+docker compose logs backend
+docker compose logs frontend
+docker compose logs db
+```
 
-   # Frontend
-   cd frontend
-   yarn test
-   ```
+**Database Connection Issues**
 
-4. **Push & Create Pull Request**
+```bash
+# Check if database is running and accessible
+docker compose logs db
+psql -h localhost -U crm_user -d crm
 
-   ```bash
-   git push origin feature/your-feature
-   ```
+# Restart backend after database is ready
+docker compose restart backend
+```
 
-   Then open a PR on the main repository. Describe your changes clearly.
+**Authentication Issues**
 
-5. **Code Review & Approval**
+- Clear browser localStorage and cookies
+- Check if tokens are expired
+- Verify JWT secrets match between services
+- Check session limits aren't exceeded
 
-   - Ensure all CI checks pass (linting, tests).
-   - Address feedback, squash/rebase if requested.
+**Build Issues**
+
+```bash
+# Backend build issues
+cd backend && mvn clean package
+
+# Frontend build issues
+cd frontend && pnpm install && pnpm build
+```
+
+### Getting Help
+
+- Check service logs: `docker compose logs <service>`
+- Ensure all prerequisites are installed
+- Verify ports 3000, 5432, and 8080 are available
+- Review the detailed Docker guide in `DOCKER_README.md`
+- Check application.properties for correct configuration
 
 ---
 
-## License
+**Ready to get started? Run `docker compose up --build` and start managing your customer relationships! 🚀**
 
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
-
----
-
-Thank you for exploring this CRM project! If you have questions, run into issues, or want to propose new features, please open an issue or pull request. Happy coding!
+_Built with ❤️ using Spring Boot, Next.js, and Docker_

@@ -162,7 +162,11 @@ export const columns: ColumnDef<OpportunityDto>[] = [
 
       return (
         <div className="flex items-center justify-end gap-2">
-          <Button size="sm">View</Button>
+          <Button size="sm" asChild>
+            <Link href={`/dashboard/opportunities/${opportunity.id}`}>
+              View
+            </Link>
+          </Button>
 
           <AddOrEditOpportunityForm
             opportunityToEdit={opportunity as OpportunityData}

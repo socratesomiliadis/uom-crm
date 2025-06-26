@@ -140,7 +140,9 @@ export const columns: ColumnDef<ContactDto>[] = [
 
       return (
         <div className="flex items-center justify-end gap-2">
-          <Button size="sm">View</Button>
+          <Button size="sm" asChild>
+            <Link href={`/dashboard/contacts/${contact.id}`}>View</Link>
+          </Button>
           <AddOrEditContactForm
             contactToEdit={contact as ContactData}
             triggerButton={

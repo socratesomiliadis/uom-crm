@@ -8,6 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import { AuthManager, User, AuthTokens } from "./auth";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -16,6 +17,11 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
+  register: (
+    username: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<boolean>;
 }
@@ -25,7 +31,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const router = useRouter();
   const isAuthenticated = !!user && AuthManager.isAuthenticated();
 
   // Listen for storage changes (when tokens are updated in another tab)
@@ -126,6 +132,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const register = async (
+    username: string,
+    email: string,
+    password: string
+  ): Promise<void> => {
+    try {
+      // Use Next.js API route
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Registration failed");
+      }
+
+      // Registration successful - no need to set tokens, user needs to login
+    } catch (error) {
+      console.error("Register error:", error);
+      throw error;
+    }
+  };
+
   const logout = async (): Promise<void> => {
     try {
       // Use Next.js API route which handles cookies
@@ -160,6 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const authData: AuthTokens = await response.json();
       AuthManager.setTokens(authData);
       setUser(authData.user);
+      router.refresh();
       return true;
     } catch (error) {
       console.error("Token refresh failed:", error);
@@ -172,6 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated,
     isLoading,
     login,
+    register,
     logout,
     refreshToken,
   };

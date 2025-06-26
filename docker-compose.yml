@@ -61,9 +61,8 @@ services:
     container_name: crm-frontend
     restart: on-failure
     environment:
-      # Point Next.js at the backend’s API (inside Docker network "backend:8080")
+      # Point Next.js at the backend's API (inside Docker network use service name "backend")
       NEXT_PUBLIC_API_BASE_URL: http://backend:8080/api
-      NEXT_PUBLIC_JWT_COOKIE_NAME: crm_jwt
     ports:
       # Map host port 3000 → container port 3000 (Next.js default)
       - "3000:3000"

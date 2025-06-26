@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { registerAction } from "@/lib/auth-actions";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 
 export default function RegisterForm() {
   const router = useRouter();
+  const { register } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,14 +28,9 @@ export default function RegisterForm() {
     }
 
     try {
-      const result = await registerAction(username, email, password);
-
-      if (result.success) {
-        // Registration successful, redirect to login
-        router.push("/");
-      } else {
-        setError(result.error || "Registration failed");
-      }
+      await register(username, email, password);
+      // Registration successful, redirect to login
+      router.push("/");
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {

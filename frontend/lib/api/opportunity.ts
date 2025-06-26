@@ -21,6 +21,22 @@ export async function getOpportunities() {
   }
 }
 
+export async function getOpportunityById(id: number) {
+  try {
+    const opportunity = await fetchDirect<OpportunityDto>(
+      `/opportunities/${id}`,
+      {
+        method: "GET",
+      },
+      TAGS.OPPORTUNITY
+    );
+
+    return opportunity;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function createOpportunity(opportunity: OpportunityCreateDto) {
   await fetchDirect(
     "/opportunities",

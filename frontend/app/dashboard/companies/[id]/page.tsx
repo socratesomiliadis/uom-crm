@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getCompanyById } from "@/lib/api/company";
 import { getContacts } from "@/lib/api/contact";
+import { getOpportunities } from "@/lib/api/opportunity";
+import { getActivities } from "@/lib/api/activity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,19 +36,45 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
     notFound();
   }
 
-  const [company, allContacts] = await Promise.all([
-    getCompanyById(companyId),
-    getContacts(),
-  ]);
+  const [company, allContacts, allOpportunities, allActivities] =
+    await Promise.all([
+      getCompanyById(companyId),
+      getContacts(),
+      getOpportunities(),
+      getActivities(),
+    ]);
 
   if (!company) {
     notFound();
   }
 
-  // Get the primary contact (first contact associated with this company)
-  const primaryContact = allContacts?.find(
-    (contact) => contact.companyId === companyId
+  // Get contacts for this company
+  const companyContacts =
+    allContacts?.filter((contact) => contact.companyId === companyId) || [];
+
+  // Get contact IDs for this company
+  const companyContactIds = companyContacts.map((contact) => contact.id);
+
+  // Get opportunities for this company's contacts
+  const companyOpportunities =
+    allOpportunities?.filter((opportunity) =>
+      companyContactIds.includes(opportunity.contactId)
+    ) || [];
+
+  // Get active opportunities (not WON or LOST)
+  const activeOpportunities = companyOpportunities.filter(
+    (opportunity) => !["WON", "LOST"].includes(opportunity.stage)
   );
+
+  // Get activities for this company's contacts
+  const companyActivities =
+    allActivities?.filter(
+      (activity) =>
+        activity.contactId && companyContactIds.includes(activity.contactId)
+    ) || [];
+
+  // Get the primary contact (first contact associated with this company)
+  const primaryContact = companyContacts[0];
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -214,22 +242,24 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
                   <Users className="w-6 h-6 mx-auto mb-2 text-blue-600" />
                   <div className="text-2xl font-bold text-blue-600">
-                    {allContacts?.filter(
-                      (contact) => contact.companyId === companyId
-                    ).length || 0}
+                    {companyContacts.length}
                   </div>
                   <div className="text-sm text-gray-600">Total Contacts</div>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <TrendingUp className="w-6 h-6 mx-auto mb-2 text-green-600" />
-                  <div className="text-2xl font-bold text-green-600">12</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {activeOpportunities.length}
+                  </div>
                   <div className="text-sm text-gray-600">
                     Active Opportunities
                   </div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <FileText className="w-6 h-6 mx-auto mb-2 text-purple-600" />
-                  <div className="text-2xl font-bold text-purple-600">89</div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    {companyActivities.length}
+                  </div>
                   <div className="text-sm text-gray-600">Total Activities</div>
                 </div>
               </div>
@@ -340,38 +370,6 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Recent Activity Placeholder */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Meeting scheduled</p>
-                    <p className="text-xs text-gray-500">2 hours ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Email sent</p>
-                    <p className="text-xs text-gray-500">1 day ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Note added</p>
-                    <p className="text-xs text-gray-500">3 days ago</p>
-                  </div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>

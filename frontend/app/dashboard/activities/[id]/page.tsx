@@ -19,8 +19,10 @@ import {
   Users,
   StickyNote,
   ClipboardList,
+  Edit,
 } from "lucide-react";
 import Link from "next/link";
+import AddOrEditActivityForm, { ActivityData } from "../add-edit-activity-form";
 
 interface ActivityPageProps {
   params: {
@@ -81,20 +83,31 @@ export default async function ActivityPage({ params }: ActivityPageProps) {
     return (
       <div className="container mx-auto py-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div
-              className={`p-2 size-14 flex items-center justify-center rounded-lg ${typeConfig.bgColor}`}
-            >
-              <TypeIcon className="h-6 w-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">
-                {activity.subject || `${activity.type} Activity`}
-              </h1>
-              <p className="text-muted-foreground">Activity #{activity.id}</p>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div
+                className={`p-2 size-14 flex items-center justify-center rounded-lg ${typeConfig.bgColor}`}
+              >
+                <TypeIcon className="h-6 w-6" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">
+                  {activity.subject || `${activity.type} Activity`}
+                </h1>
+                <p className="text-muted-foreground">Activity #{activity.id}</p>
+              </div>
             </div>
           </div>
+          <AddOrEditActivityForm
+            activityToEdit={activity as ActivityData}
+            triggerButton={
+              <Button>
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Activity
+              </Button>
+            }
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -266,16 +279,45 @@ export default async function ActivityPage({ params }: ActivityPageProps) {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button className="w-full" variant="outline">
-                  Edit Activity
-                </Button>
-                <Button className="w-full" variant="outline">
-                  Duplicate Activity
-                </Button>
-                <Separator />
-                <Button className="w-full" variant="destructive">
-                  Delete Activity
-                </Button>
+                {contact && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      asChild
+                    >
+                      <a href={`mailto:${contact.email}`}>
+                        <Mail className="w-4 h-4 mr-2" />
+                        Email Contact
+                      </a>
+                    </Button>
+                    {contact.phone && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        asChild
+                      >
+                        <a href={`tel:${contact.phone}`}>
+                          <Phone className="w-4 h-4 mr-2" />
+                          Call Contact
+                        </a>
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      asChild
+                    >
+                      <Link href={`/dashboard/contacts/${contact.id}`}>
+                        <User className="w-4 h-4 mr-2" />
+                        View Contact
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -9,7 +9,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
           .addMapping("/api/**")
-          .allowedOrigins("http://localhost:3000")     // Next.js origin
+          .allowedOrigins("http://localhost:3000", "http://frontend:3000")     // Host and Docker origins
           .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
           .allowedHeaders("*")
           .allowCredentials(true);
